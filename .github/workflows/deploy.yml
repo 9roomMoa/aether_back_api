@@ -24,7 +24,7 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh -i ${{ secrets.EC2_SSH_KEY }} ec2-user@${{ secrets.EC2_IP }} << 'EOF'
-            cd /Users/ec2-user/vscodeProject/capstone/9roomMoa
+            cd /home/ec2-user/capstone/aether_back
             git pull origin main
             npm install
             pm2 restart 9roommoa  # PM2로 애플리케이션 재시작
