@@ -38,7 +38,7 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh ec2 'cd /home/ubuntu/capstone/aether_back && git pull origin main && npm install && pm2 restart 9roommoa'
+          ssh -v ec2 'cd /home/ubuntu/capstone/aether_back && git pull origin main && npm install && pm2 restart 9roommoa'
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
           EC2_IP: ${{ secrets.EC2_IP }}
