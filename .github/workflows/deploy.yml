@@ -25,7 +25,7 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa  # GitHub Secrets에서 비공개 키를 파일로 저장
-          chmod 600 ~/.ssh/id_rsa  # 파일 권한 설정
+          chmod 600 ~/.ssh/id_rsa  # 파일 권한을 설정
 
           # SSH 설정 파일에 호스트 정보를 추가
           cat >> ~/.ssh/config << 'EOF'
