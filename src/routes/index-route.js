@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   console.log('hi');
-  res.send('hello');
+  res.send('ci/cd test ok!');
 });
 
 module.exports = router;
