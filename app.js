@@ -1,11 +1,44 @@
 const express = require('express');
 const session = require('express-session');
+const dotenv = require('dotenv');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const cors = require('cors');
+const { StatusCodes } = require('http-status-codes');
 
 const indexRouter = require('./src/routes/index-route');
 
-const app = express();
+dotenv.config();
 
-const PORT = process.env.PORT || 3000;
+const app = express();
+app.set('port', process.env.PORT || 3000);
+
+// 보안 관련 미들웨어 및 로깅 설정 (production 환경에 따른 설정)
+if (process.env.NODE_ENV === 'production') {
+  app.enable('trust proxy');
+  app.use(morgan('combined')); // 생산 환경에서는 'combined'로 로깅
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+      crossOriginResourcePolicy: false,
+    })
+  );
+} else {
+  app.use(morgan('dev')); // 개발 환경에서는 'dev'로 로깅
+}
+
+// CORS 설정
+app.use(
+  cors({
+    origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // 세션 설정
 app.use(
@@ -14,30 +47,24 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production', // production 환경에서는 secure 속성 설정
       httpOnly: true,
-      maxAge: 1000 * 60 * 60,
+      maxAge: 1000 * 60 * 60, // 세션 만료 시간 설정 (1시간)
     },
   })
 );
 
-app.use('/', indexRouter);
-
-// 디버깅용 세션 확인 엔드포인트
-if (process.env.NODE_ENV !== 'production') {
-  app.get('/session', (req, res) => {
-    console.log('세션 데이터:', req.session);
-    res.send(req.session);
-  });
-}
+app.use('/', indexRouter); // 라우팅 처리
 
 // 에러 핸들링 미들웨어
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: '서버 에러 발생!' });
+  res
+    .status(StatusCodes.INTERNAL_SERVER_ERROR)
+    .json({ message: '서버 에러 발생!' });
 });
 
 // 서버 시작
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(app.get('port'), () => {
+  console.log(`Server running on http://localhost:${app.get('port')}`);
 });
