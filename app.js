@@ -11,7 +11,7 @@ const indexRouter = require('./src/routes/index-route');
 dotenv.config();
 
 const app = express();
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3001);
 
 // 보안 관련 미들웨어 및 로깅 설정 (production 환경에 따른 설정)
 // if (process.env.NODE_ENV === 'production') {
@@ -65,6 +65,6 @@ app.use((err, req, res, next) => {
 });
 
 // 서버 시작
-app.listen(3000, () => {
+app.listen(3001, () => {
   console.log(`Server running on http://localhost:${app.get('port')}`);
 });
