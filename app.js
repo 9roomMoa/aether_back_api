@@ -8,10 +8,10 @@ const { StatusCodes } = require('http-status-codes');
 
 const indexRouter = require('./src/routes/index-route');
 
-dotenv.config();
+// dotenv.config();
 
 const app = express();
-app.set('port', process.env.PORT || 3001);
+app.set('port', process.env.PORT || 3000);
 
 // 보안 관련 미들웨어 및 로깅 설정 (production 환경에 따른 설정)
 // if (process.env.NODE_ENV === 'production') {
@@ -37,22 +37,22 @@ app.set('port', process.env.PORT || 3001);
 //   })
 // );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: false }));
 
-// 세션 설정
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production', // production 환경에서는 secure 속성 설정
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60, // 세션 만료 시간 설정 (1시간)
-    },
-  })
-);
+// // 세션 설정
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET || 'secret-key',
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       secure: process.env.NODE_ENV === 'production', // production 환경에서는 secure 속성 설정
+//       httpOnly: true,
+//       maxAge: 1000 * 60 * 60, // 세션 만료 시간 설정 (1시간)
+//     },
+//   })
+// );
 
 app.use('/', indexRouter); // 라우팅 처리
 
@@ -65,6 +65,6 @@ app.use((err, req, res, next) => {
 });
 
 // 서버 시작
-app.listen(3001, () => {
+app.listen(3000, () => {
   console.log(`Server running on http://localhost:${app.get('port')}`);
 });
