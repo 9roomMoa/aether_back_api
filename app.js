@@ -1,9 +1,9 @@
 const express = require('express');
 const session = require('express-session');
 const dotenv = require('dotenv');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const cors = require('cors');
+// const helmet = require('helmet');
+// const morgan = require('morgan');
+// const cors = require('cors');
 const { StatusCodes } = require('http-status-codes');
 
 const indexRouter = require('./src/routes/index-route');
