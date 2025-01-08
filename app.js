@@ -65,6 +65,6 @@ app.use((err, req, res, next) => {
 });
 
 // 서버 시작
-app.listen(app.get('port'), () => {
+app.listen(3000, () => {
   console.log(`Server running on http://localhost:${app.get('port')}`);
 });
