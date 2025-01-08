@@ -29,30 +29,30 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // CORS 설정
-app.use(
-  cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     credentials: true,
+//   })
+// );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // 세션 설정
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production', // production 환경에서는 secure 속성 설정
-      httpOnly: true,
-      maxAge: 1000 * 60 * 60, // 세션 만료 시간 설정 (1시간)
-    },
-  })
-);
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET || 'secret-key',
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       secure: process.env.NODE_ENV === 'production', // production 환경에서는 secure 속성 설정
+//       httpOnly: true,
+//       maxAge: 1000 * 60 * 60, // 세션 만료 시간 설정 (1시간)
+//     },
+//   })
+// );
 
 app.use('/', indexRouter); // 라우팅 처리
 
