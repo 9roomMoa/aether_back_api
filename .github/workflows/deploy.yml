@@ -41,27 +41,18 @@ jobs:
         run: |
           ssh 9roommoa-ec2 'npm install --prefix /opt/app/'
 
-      - name: Copy systemd service file
+      - name: Install PM2 Globally
         run: |
-          ssh 9roommoa-ec2 '
-            echo "[Unit]
-            Description=9roomMoa-ec2
-            After=network.target
+          ssh 9roommoa-ec2 'sudo npm install -g pm2'
 
-            [Service]
-            User=${USER}
-            ExecStart=/usr/bin/npm run dev --prefix /opt/app/
-            Restart=always
-
-            [Install]
-            WantedBy=multi-user.target" | sudo tee /etc/systemd/system/app.service
-          '
-
-      - name: Enable systemd service
+      - name: Start Application with PM2
         run: |
-          ssh 9roommoa-ec2 'sudo systemctl daemon-reload'
-          ssh 9roommoa-ec2 'sudo systemctl enable app'
+          ssh 9roommoa-ec2 'pm2 start /opt/app/app.js --name "9roommoa"'
 
-      - name: Restart systemd service
+      - name: Save PM2 Process List
         run: |
-          ssh 9roommoa-ec2 'sudo systemctl restart app'
+          ssh 9roommoa-ec2 'pm2 save'
+
+      - name: Check PM2 Process List
+        run: |
+          ssh 9roommoa-ec2 'pm2 list'
