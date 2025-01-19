@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cors = require('cors');
+const connectDB = require('.//config/database');
 const { StatusCodes } = require('http-status-codes');
 
 const indexRouter = require('./src/routes/index-route');
@@ -63,6 +64,8 @@ app.use((err, req, res, next) => {
     .status(StatusCodes.INTERNAL_SERVER_ERROR)
     .json({ message: '서버 에러 발생!' });
 });
+
+connectDB();
 
 // 서버 시작
 app.listen(app.get('port'), () => {
