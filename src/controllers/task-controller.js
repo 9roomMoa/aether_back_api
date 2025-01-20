@@ -27,6 +27,13 @@ exports.createTask = async (req, res) => {
 
     const taskData = value;
 
+    if (isInvalidDateRange(taskData.startDate, taskData.dueDate)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'start date cannot be later than due date',
+      });
+    }
+
     const task = await taskService.createTask(taskData);
 
     return res.status(StatusCodes.CREATED).json({
@@ -41,4 +48,13 @@ exports.createTask = async (req, res) => {
       message: 'Internal Server Error',
     });
   }
+};
+
+const isInvalidDateRange = (startDate, dueDate) => {
+  if (!startDate || !dueDate) {
+    return false;
+  }
+  const start = new Date(startDate);
+  const due = new Date(dueDate);
+  return start > due;
 };
