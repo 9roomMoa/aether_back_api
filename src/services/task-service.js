@@ -16,3 +16,18 @@ exports.createTask = async (taskData) => {
     throw new Error('Error occured during creating new task');
   }
 };
+
+exports.getAllTasks = async (project) => {
+  try {
+    const existingProject = await Project.findById(project);
+    if (!existingProject) {
+      throw new Error('Invalid Project ID');
+    }
+    const task = await Task.find({ project: project });
+
+    return task;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error during getting tasks');
+  }
+};
