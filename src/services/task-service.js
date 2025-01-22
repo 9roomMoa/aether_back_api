@@ -16,3 +16,12 @@ exports.createTask = async (taskData) => {
     throw new Error('Error occured during creating new task');
   }
 };
+
+exports.getTaskInfo = async (tid) => {
+  const existingTask = await Task.findById(tid);
+  if (!existingTask) {
+    throw new Error('Invalid Task ID');
+  } else {
+    return existingTask;
+  }
+};
