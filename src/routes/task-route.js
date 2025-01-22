@@ -5,4 +5,6 @@ const taskController = require('../controllers/task-controller');
 
 router.post('/', taskController.createTask);
 
+router.get('/:tid/info', taskController.getTaskInfo);
+
 module.exports = router;

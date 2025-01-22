@@ -17,10 +17,12 @@ const taskSchema = new mongoose.Schema(
       ref: 'Project',
       required: true,
     },
-    assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
+    assignedTo: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -28,6 +30,11 @@ const taskSchema = new mongoose.Schema(
     },
     startDate: { type: Date },
     dueDate: { type: Date },
+    projectScope: {
+      type: String,
+      enum: ['Project', 'Task'],
+      default: 'Project',
+    },
   },
   { timestamps: true }
 );

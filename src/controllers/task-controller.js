@@ -58,3 +58,37 @@ const isInvalidDateRange = (startDate, dueDate) => {
   const due = new Date(dueDate);
   return start > due;
 };
+
+exports.getTaskInfo = async (req, res) => {
+  try {
+    const { tid } = req.params;
+    const { userId } = req.body;
+
+    if (!tid) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Invalide Task ID',
+      });
+    }
+
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Invalid User ID',
+      });
+    }
+    const taskInfo = await taskService.getTaskInfo(tid, userId);
+
+    return res.status(StatusCodes.OK).json({
+      data: taskInfo,
+      success: true,
+      message: 'Task Info retrieved successfully!',
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};
