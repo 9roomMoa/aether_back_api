@@ -64,7 +64,9 @@ exports.getAllTasks = async (project) => {
     if (!existingProject) {
       throw new Error('Invalid Project ID');
     }
-    const task = await Task.find({ project: project });
+    const task = await Task.find({ project: project }).select(
+      'title description status priority'
+    );
 
     return task;
   } catch (err) {
