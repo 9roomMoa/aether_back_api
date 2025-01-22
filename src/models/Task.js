@@ -28,6 +28,11 @@ const taskSchema = new mongoose.Schema(
     },
     startDate: { type: Date },
     dueDate: { type: Date },
+    projectScope: {
+      type: String,
+      enum: ['Project', 'Task'],
+      default: 'Project',
+    },
   },
   { timestamps: true }
 );
