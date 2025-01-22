@@ -7,4 +7,6 @@ router.post('/', taskController.createTask);
 
 router.get('/', taskController.getAllTasks);
 
+router.get('/:tid/info', taskController.getTaskInfo);
+
 module.exports = router;

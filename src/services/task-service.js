@@ -31,3 +31,12 @@ exports.getAllTasks = async (project) => {
     throw new Error('Error during getting tasks');
   }
 };
+
+exports.getTaskInfo = async (tid) => {
+  const existingTask = await Task.findById(tid);
+  if (!existingTask) {
+    throw new Error('Invalid Task ID');
+  } else {
+    return existingTask;
+  }
+};
