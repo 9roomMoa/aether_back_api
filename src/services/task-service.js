@@ -1,5 +1,6 @@
 const Project = require('../models/Project');
 const Task = require('../models/Task');
+const User = require('../models/User');
 
 exports.createTask = async (taskData) => {
   try {
@@ -33,10 +34,17 @@ exports.getAllTasks = async (project) => {
 };
 
 exports.getTaskInfo = async (tid) => {
-  const existingTask = await Task.findById(tid);
+  const existingTask = await Task.findById(tid).lean();
   if (!existingTask) {
     throw new Error('Invalid Task ID');
-  } else {
-    return existingTask;
   }
+  const creator = await User.findById(existingTask.createdBy);
+  if (!creator) {
+    throw new Error('Invalid Creator Id');
+  }
+
+  return {
+    ...existingTask,
+    creator: creator.name,
+  };
 };
