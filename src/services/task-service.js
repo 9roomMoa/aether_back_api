@@ -1,6 +1,7 @@
 const Project = require('../models/Project');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const taskUtils = require('../utils/task-util');
 
 exports.createTask = async (taskData) => {
   try {
@@ -33,14 +34,17 @@ exports.getAllTasks = async (project) => {
   }
 };
 
-exports.getTaskInfo = async (tid) => {
+exports.getTaskInfo = async (tid, userId) => {
   const existingTask = await Task.findById(tid).lean();
   if (!existingTask) {
     throw new Error('Invalid Task ID');
   }
   const creator = await User.findById(existingTask.createdBy);
-  if (!creator) {
-    throw new Error('Invalid Creator Id');
+
+  const isAcceptable = await taskUtils.scopeChecker(userId, existingTask);
+
+  if (!isAcceptable) {
+    throw new Error('User not includes in this task');
   }
 
   return {
