@@ -35,20 +35,25 @@ exports.getAllTasks = async (project) => {
 };
 
 exports.getTaskInfo = async (tid, userId) => {
-  const existingTask = await Task.findById(tid).lean();
-  if (!existingTask) {
-    throw new Error('Invalid Task ID');
+  try {
+    const existingTask = await Task.findById(tid).lean();
+    if (!existingTask) {
+      throw new Error('Invalid Task ID');
+    }
+    const creator = await User.findById(existingTask.createdBy);
+
+    const isAcceptable = await taskUtils.scopeChecker(userId, existingTask);
+
+    if (!isAcceptable) {
+      throw new Error('User not includes in this task');
+    }
+
+    return {
+      ...existingTask,
+      creator: creator.name,
+    };
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error occured during getting task information');
   }
-  const creator = await User.findById(existingTask.createdBy);
-
-  const isAcceptable = await taskUtils.scopeChecker(userId, existingTask);
-
-  if (!isAcceptable) {
-    throw new Error('User not includes in this task');
-  }
-
-  return {
-    ...existingTask,
-    creator: creator.name,
-  };
 };
