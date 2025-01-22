@@ -59,3 +59,23 @@ exports.getAllTasks = async (project) => {
     throw new Error('Error during getting tasks');
   }
 };
+
+exports.deleteTask = async (userId, taskId) => {
+  try {
+    const existingTask = await Task.findById(taskId);
+    if (!existingTask) {
+      throw new Error('Invalid Task ID');
+    }
+    const isCreator = taskUtils.creatorChecker(userId, existingTask);
+    if (!isCreator) {
+      throw new Error('You dont have privilege to delete this task');
+    }
+
+    await Task.findByIdAndDelete(taskId);
+
+    return { success: true, message: 'Task successfully deleted' };
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error during deleting a task');
+  }
+};

@@ -59,7 +59,6 @@ const isInvalidDateRange = (startDate, dueDate) => {
   return start > due;
 };
 
-
 exports.getAllTasks = async (req, res) => {
   try {
     const { project } = req.body;
@@ -100,26 +99,25 @@ exports.getAllTasks = async (req, res) => {
   }
 };
 
-
 exports.getTaskInfo = async (req, res) => {
   try {
-    const { tid } = req.params;
+    const { taskId } = req.params;
     const { userId } = req.body;
 
-    if (!tid) {
+    if (!taskId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'Invalide Task ID',
+        message: 'Task ID Omission',
       });
     }
 
     if (!userId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'Invalid User ID',
+        message: 'User ID Omission',
       });
     }
-    const taskInfo = await taskService.getTaskInfo(tid, userId);
+    const taskInfo = await taskService.getTaskInfo(taskId, userId);
 
     return res.status(StatusCodes.OK).json({
       data: taskInfo,
@@ -135,3 +133,34 @@ exports.getTaskInfo = async (req, res) => {
   }
 };
 
+exports.deleteTask = async (req, res) => {
+  try {
+    const { taskId, userId } = req.body;
+    if (!taskId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Task ID Omission',
+      });
+    }
+
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User ID Omission',
+      });
+    }
+
+    await taskService.deleteTask(userId, taskId);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Task deleted successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal Server Error: ' + err.message,
+    });
+  }
+};
