@@ -19,21 +19,6 @@ exports.createTask = async (taskData) => {
   }
 };
 
-exports.getAllTasks = async (project) => {
-  try {
-    const existingProject = await Project.findById(project);
-    if (!existingProject) {
-      throw new Error('Invalid Project ID');
-    }
-    const task = await Task.find({ project: project });
-
-    return task;
-  } catch (err) {
-    console.error(err);
-    throw new Error('Error during getting tasks');
-  }
-};
-
 exports.getTaskInfo = async (tid, userId) => {
   try {
     const existingTask = await Task.findById(tid).lean();
