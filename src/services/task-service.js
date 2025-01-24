@@ -66,7 +66,7 @@ exports.deleteTask = async (userId, taskId) => {
     if (!existingTask) {
       throw new Error('Invalid Task ID');
     }
-    const isCreator = taskUtils.creatorChecker(userId, existingTask);
+    const isCreator = taskUtils.isTaskCreator(userId, existingTask);
     if (!isCreator) {
       throw new Error('You dont have privilege to delete this task');
     }

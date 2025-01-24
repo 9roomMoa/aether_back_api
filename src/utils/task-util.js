@@ -10,6 +10,6 @@ exports.scopeChecker = async (userId, task) => {
   }
 };
 
-exports.creatorChecker = async (userId, task) => {
+exports.isTaskCreator = async (userId, task) => {
   return task.createdBy.toString() === userId;
 };
