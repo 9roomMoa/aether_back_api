@@ -1,7 +1,6 @@
 const Joi = require('joi');
 const { StatusCodes } = require('http-status-codes');
 const commentService = require('../services/comment-service');
-const taskUtil = require('../utils/task-util');
 
 const commentValidationSchema = Joi.object({
   commenterId: Joi.string().required(),
