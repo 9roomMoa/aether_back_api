@@ -12,6 +12,8 @@ router.delete('/', taskController.deleteTask);
 
 router.get('/:tid/info', taskController.getTaskInfo);
 
-router.post('/:tid/comment', commentController.createComment);
+router.post('/:tid/comments', commentController.createComment);
+
+router.get('/:tid/comments', commentController.getComments);
 
 module.exports = router;

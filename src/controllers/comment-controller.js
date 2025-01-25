@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { StatusCodes } = require('http-status-codes');
 const commentService = require('../services/comment-service');
+const taskUtil = require('../utils/task-util');
 
 const commentValidationSchema = Joi.object({
   commenterId: Joi.string().required(),
@@ -41,6 +42,34 @@ exports.createComment = async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal Server Error: ' + err.message,
+    });
+  }
+};
+
+exports.getComments = async (req, res) => {
+  try {
+    const { tid } = req.params;
+    const { userId } = req.body;
+
+    if (!userId || !tid) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'taskId and userId must be required',
+      });
+    }
+
+    const comments = await commentService.getComments(userId, tid);
+
+    return res.status(StatusCodes.OK).json({
+      data: comments,
+      success: true,
+      message: 'Retrieved comments successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
     });
   }
 };
