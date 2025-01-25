@@ -13,3 +13,7 @@ exports.scopeChecker = async (userId, task) => {
 exports.isTaskCreator = async (userId, task) => {
   return task.createdBy.toString() === userId;
 };
+
+exports.isCommentCreator = async (userId, comment) => {
+  return comment.commenterId.toString() === userId;
+};

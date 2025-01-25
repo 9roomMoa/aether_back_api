@@ -16,4 +16,6 @@ router.post('/:tid/comments', commentController.createComment);
 
 router.get('/:tid/comments', commentController.getComments);
 
+router.delete('/:tid/comments', commentController.deleteComment);
+
 module.exports = router;

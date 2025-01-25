@@ -61,3 +61,25 @@ exports.getComments = async (userId, taskId) => {
     throw new Error('Error occured during getting comments');
   }
 };
+
+exports.deleteComment = async (userId, taskId, commentId) => {
+  try {
+    const existingTask = await Task.findById(taskId);
+    if (!existingTask) {
+      throw new Error('Invalid task id');
+    }
+
+    const comment = await Comment.findById(commentId);
+    const isCreator = await taskUtil.isCommentCreator(userId, comment);
+
+    if (!isCreator) {
+      throw new Error('No privilege to delete this comment');
+    }
+
+    const result = await Comment.findByIdAndDelete(commentId);
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error occured during deleting a comment');
+  }
+};
