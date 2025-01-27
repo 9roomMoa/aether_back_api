@@ -70,6 +70,9 @@ exports.deleteComment = async (userId, taskId, commentId) => {
     }
 
     const comment = await Comment.findById(commentId);
+    if (!comment) {
+      throw new Error('Invalid comment Id');
+    }
     const isCreator = await taskUtil.isCommentCreator(userId, comment);
 
     if (!isCreator) {
