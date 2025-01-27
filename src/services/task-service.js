@@ -1,7 +1,7 @@
 const Project = require('../models/Project');
 const Task = require('../models/Task');
 const User = require('../models/User');
-const taskUtils = require('../utils/task-util');
+const taskUtil = require('../utils/task-util');
 
 exports.createTask = async (taskData) => {
   try {
@@ -27,7 +27,7 @@ exports.getTaskInfo = async (tid, userId) => {
     }
     const creator = await User.findById(existingTask.createdBy);
 
-    const isAcceptable = await taskUtils.scopeChecker(userId, existingTask);
+    const isAcceptable = await taskUtil.scopeChecker(userId, existingTask);
 
     if (!isAcceptable) {
       throw new Error('User not includes in this task');
@@ -66,7 +66,7 @@ exports.deleteTask = async (userId, taskId) => {
     if (!existingTask) {
       throw new Error('Invalid Task ID');
     }
-    const isCreator = taskUtils.isTaskCreator(userId, existingTask);
+    const isCreator = taskUtil.isTaskCreator(userId, existingTask);
     if (!isCreator) {
       throw new Error('You dont have privilege to delete this task');
     }
@@ -76,6 +76,38 @@ exports.deleteTask = async (userId, taskId) => {
     return { success: true, message: 'Task successfully deleted' };
   } catch (err) {
     console.error(err);
-    throw new Error('Error during deleting a task');
+    throw new Error('Error occured during deleting a task');
+  }
+};
+
+exports.getManagerInfo = async (userId, taskId) => {
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error('Invalid user id');
+    }
+    const existingTask = await Task.findById(taskId);
+    const task = await Task.findById(taskId)
+      .populate('createdBy assignedTo', 'name email')
+      .lean();
+
+    if (!task) {
+      throw new Error('Invalid task id');
+    }
+
+    const isAccessible = await taskUtil.scopeChecker(userId, existingTask);
+
+    if (!isAccessible) {
+      throw new Error('You dont have privilege to get info');
+    }
+
+    const result = {
+      createdBy: task.createdBy,
+      assignedTo: task.assignedTo,
+    };
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error occured during getting Manager info');
   }
 };

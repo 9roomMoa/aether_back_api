@@ -164,3 +164,31 @@ exports.deleteTask = async (req, res) => {
     });
   }
 };
+
+exports.getManagerInfo = async (req, res) => {
+  try {
+    const { tid } = req.params;
+    const { userId } = req.body;
+
+    if (!tid || !userId) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'taskid and userid are must be required',
+      });
+    }
+
+    const managers = await taskService.getManagerInfo(userId, tid);
+
+    return res.status(StatusCodes.OK).json({
+      data: managers,
+      success: true,
+      message: 'Managers info retrieved successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};

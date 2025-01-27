@@ -18,4 +18,6 @@ router.get('/:tid/comments', commentController.getComments);
 
 router.delete('/:tid/comments', commentController.deleteComment);
 
+router.get('/:tid/managers', taskController.getManagerInfo);
+
 module.exports = router;
