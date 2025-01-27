@@ -72,3 +72,31 @@ exports.getComments = async (req, res) => {
     });
   }
 };
+
+exports.deleteComment = async (req, res) => {
+  try {
+    const { tid } = req.params;
+    const { userId, commentId } = req.body;
+
+    if (!tid || !userId) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'taskId and userId must be required',
+      });
+    }
+
+    const result = await commentService.deleteComment(userId, tid, commentId);
+
+    return res.status(StatusCodes.OK).json({
+      data: result,
+      success: true,
+      message: 'comment deleted successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};
