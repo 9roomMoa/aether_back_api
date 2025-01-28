@@ -17,3 +17,11 @@ exports.isTaskCreator = async (userId, task) => {
 exports.isCommentCreator = async (userId, comment) => {
   return comment.commenterId.toString() === userId;
 };
+
+exports.isExisitingResource = async (Model, id) => {
+  const resource = await Model.findById(id);
+  if (!resource) {
+    throw new Error(`invalid ${Model} id`);
+  }
+  return resource;
+};

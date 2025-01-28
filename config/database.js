@@ -38,11 +38,11 @@ const seedDatabase = async () => {
     console.log('Seeding initial data...');
 
     // 예제 User 생성
-    // const user = await User.create({
-    //   name: '배수연',
-    //   email: 'dianadjWjrn@naver.com',
-    //   password: 'pwpw1234@',
-    // });
+    const user = await User.create({
+      name: '조윤영',
+      email: 'dbsdud@gmail.com',
+      password: 'passwd1234@',
+    });
 
     // 예제 Project 생성
     // await Project.create({
@@ -52,17 +52,17 @@ const seedDatabase = async () => {
     // });
 
     // 예제 Task 생성
-    await Task.create({
-      title: 'Test Task4',
-      description: 'This is a test task for checking scope',
-      status: 'To Do',
-      priority: 3,
-      project: '678e1623945330ce231d7fcb',
-      assignedTo: '678e1623945330ce231d7fc9',
-      createdBy: '6790968a79bfefbffcfa362d',
-      startDate: new Date(),
-      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1주일 후
-    });
+    // await Task.create({
+    //   title: 'Test Task4',
+    //   description: 'This is a test task for checking scope',
+    //   status: 'To Do',
+    //   priority: 3,
+    //   project: '678e1623945330ce231d7fcb',
+    //   assignedTo: '678e1623945330ce231d7fc9',
+    //   createdBy: '6790968a79bfefbffcfa362d',
+    //   startDate: new Date(),
+    //   dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1주일 후
+    // });
 
     console.log('Initial data seeded successfully!');
   } catch (err) {
