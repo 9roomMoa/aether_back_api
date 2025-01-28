@@ -192,3 +192,31 @@ exports.getManagerInfo = async (req, res) => {
     });
   }
 };
+
+exports.addManagers = async (req, res) => {
+  try {
+    const { tid } = req.params;
+    const { userId, managerId } = req.body;
+
+    if (!tid || !userId || !managerId) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'taskId, userId and managerId must be required',
+      });
+    }
+
+    const result = await taskService.addManagers(tid, userId, managerId);
+
+    return res.status(StatusCodes.OK).json({
+      data: result,
+      success: true,
+      message: 'Added successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};

@@ -111,3 +111,28 @@ exports.getManagerInfo = async (userId, taskId) => {
     throw new Error('Error occured during getting Manager info');
   }
 };
+
+exports.addManagers = async (taskId, userId, managerId) => {
+  try {
+    const task = await taskUtil.isExisitingResource(Task, taskId);
+    await taskUtil.isExisitingResource(User, userId);
+    const isAccessible = await taskUtil.isTaskCreator(userId, task);
+    if (!isAccessible) {
+      throw new Error('You dont have privilege to add managers');
+    }
+    await taskUtil.isExisitingResource(User, managerId);
+
+    const updatedTask = Task.findByIdAndUpdate(
+      taskId,
+      {
+        $addToSet: { assignedTo: managerId },
+      },
+      { new: true }
+    );
+
+    return updatedTask;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error occured during adding managers');
+  }
+};
