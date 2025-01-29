@@ -220,3 +220,47 @@ exports.addManagers = async (req, res) => {
     });
   }
 };
+
+exports.searchComments = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const { tid } = req.params;
+    const { keyword } = req.query;
+
+    if (!userId || !tid) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'userId and taskId must be required',
+      });
+    }
+
+    if (!keyword || keyword.trim() === '') {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'there is no keyword',
+      });
+    }
+
+    const comments = await taskService.searchComments(keyword, tid, userId);
+
+    if (!comments) {
+      return res.status(StatusCodes.OK).json({
+        data: [],
+        success: true,
+        message: 'No comments',
+      });
+    }
+
+    return res.status(StatusCodes.OK).json({
+      data: comments,
+      success: true,
+      message: 'Comments retrieved succesfully',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};

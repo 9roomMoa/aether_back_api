@@ -1,6 +1,7 @@
 const Project = require('../models/Project');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const Comment = require('../models/Comment');
 const taskUtil = require('../utils/task-util');
 
 exports.createTask = async (taskData) => {
@@ -134,5 +135,26 @@ exports.addManagers = async (taskId, userId, managerId) => {
   } catch (err) {
     console.error(err);
     throw new Error('Error occured during adding managers');
+  }
+};
+
+exports.searchComments = async (keyword, taskId, userId) => {
+  try {
+    const task = await taskUtil.isExisitingResource(Task, taskId);
+
+    const isAccessible = await taskUtil.scopeChecker(userId, task);
+    if (!isAccessible) {
+      throw new Error('You dont have privilege to access to comments');
+    }
+    console.log(keyword);
+    const comments = await Comment.find({
+      taskId: taskId,
+      content: { $regex: keyword, $options: 'i' },
+    });
+
+    return comments;
+  } catch (err) {
+    console.error(err);
+    throw new Error('error occured during searching comments');
   }
 };
