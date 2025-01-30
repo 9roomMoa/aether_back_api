@@ -10,6 +10,14 @@ const projectSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    startDate: { type: Date, required: true },
+    dueDate: { type: Date, required: true },
+    scope: { type: String, enum: ['Public', 'Team'], default: 'Team' },
+    status: {
+      type: String,
+      enum: ['To Do', 'In Progress', 'Done'],
+      default: 'To Do',
+    },
   },
   { timestamps: true }
 );
