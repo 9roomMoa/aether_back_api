@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const { StatusCodes } = require('http-status-codes');
 const taskService = require('../services/task-service');
+const taskUtil = require('../utils/task-util');
 
 const taskValidationSchema = Joi.object({
   title: Joi.string().required(),
@@ -8,7 +9,7 @@ const taskValidationSchema = Joi.object({
   status: Joi.string().valid('To Do', 'In Progress', 'Done').default('To Do'),
   priority: Joi.number().integer().min(1).max(5),
   project: Joi.string().required(), // 프로젝트 ID
-  assignedTo: Joi.string().optional(), // 사용자 ID
+  assignedTo: Joi.array().items(Joi.string()).optional(), // 사용자 ID
   createdBy: Joi.string().required(), // 생성자 ID
   startDate: Joi.date().optional(),
   dueDate: Joi.date().optional(),
@@ -27,7 +28,7 @@ exports.createTask = async (req, res) => {
 
     const taskData = value;
 
-    if (isInvalidDateRange(taskData.startDate, taskData.dueDate)) {
+    if (taskUtil.isInvalidDateRange(taskData.startDate, taskData.dueDate)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'start date cannot be later than due date',
@@ -48,15 +49,6 @@ exports.createTask = async (req, res) => {
       message: 'Internal Server Error',
     });
   }
-};
-
-const isInvalidDateRange = (startDate, dueDate) => {
-  if (!startDate || !dueDate) {
-    return false;
-  }
-  const start = new Date(startDate);
-  const due = new Date(dueDate);
-  return start > due;
 };
 
 exports.getAllTasks = async (req, res) => {

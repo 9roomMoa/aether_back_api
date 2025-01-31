@@ -25,3 +25,12 @@ exports.isExisitingResource = async (Model, id) => {
   }
   return resource;
 };
+
+exports.isInvalidDateRange = (startDate, dueDate) => {
+  if (!startDate || !dueDate) {
+    return false;
+  }
+  const start = new Date(startDate);
+  const due = new Date(dueDate);
+  return start > due;
+};

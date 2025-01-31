@@ -6,10 +6,6 @@ const taskUtil = require('../utils/task-util');
 
 exports.createTask = async (taskData) => {
   try {
-    const existingProject = await Project.findById(taskData.project);
-    if (!existingProject) {
-      throw new Error('Invalid Project ID');
-    }
     const task = new Task(taskData);
     await task.save();
 
