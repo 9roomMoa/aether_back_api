@@ -18,7 +18,7 @@ exports.isCommentCreator = async (userId, comment) => {
   return comment.commenterId.toString() === userId;
 };
 
-exports.isExisitingResource = async (Model, id) => {
+exports.isExistingResource = async (Model, id) => {
   const resource = await Model.findById(id);
   if (!resource) {
     throw new Error(`invalid ${Model} id`);
@@ -33,4 +33,8 @@ exports.isInvalidDateRange = (startDate, dueDate) => {
   const start = new Date(startDate);
   const due = new Date(dueDate);
   return start > due;
+};
+
+exports.isProjectCreator = async (userId, project) => {
+  return project.createdBy.toString() === userId;
 };
