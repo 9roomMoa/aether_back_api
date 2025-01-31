@@ -111,13 +111,13 @@ exports.getManagerInfo = async (userId, taskId) => {
 
 exports.addManagers = async (taskId, userId, managerId) => {
   try {
-    const task = await taskUtil.isExisitingResource(Task, taskId);
-    await taskUtil.isExisitingResource(User, userId);
+    const task = await taskUtil.isExistingResource(Task, taskId);
+    await taskUtil.isExistingResource(User, userId);
     const isAccessible = await taskUtil.isTaskCreator(userId, task);
     if (!isAccessible) {
       throw new Error('You dont have privilege to add managers');
     }
-    await taskUtil.isExisitingResource(User, managerId);
+    await taskUtil.isExistingResource(User, managerId);
 
     const updatedTask = Task.findByIdAndUpdate(
       taskId,
@@ -136,7 +136,7 @@ exports.addManagers = async (taskId, userId, managerId) => {
 
 exports.searchComments = async (keyword, taskId, userId) => {
   try {
-    const task = await taskUtil.isExisitingResource(Task, taskId);
+    const task = await taskUtil.isExistingResource(Task, taskId);
 
     const isAccessible = await taskUtil.scopeChecker(userId, task);
     if (!isAccessible) {

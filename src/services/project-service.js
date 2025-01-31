@@ -23,7 +23,7 @@ exports.createProject = async (data) => {
 
 exports.patchProject = async (pid, userId, data) => {
   try {
-    const isExistingProject = await taskUtils.isExisitingResource(Project, pid);
+    const isExistingProject = await taskUtils.isExistingResource(Project, pid);
     if (!isExistingProject) {
       throw new Error('No project found');
     }
