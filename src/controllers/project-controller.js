@@ -1,22 +1,13 @@
 const { StatusCodes } = require('http-status-codes');
-const Joi = require('joi');
+
 const taskUtil = require('../utils/task-util');
 const projectService = require('../services/project-service');
-
-const projectValidationSchema = Joi.object({
-  name: Joi.string().required(),
-  description: Joi.string().optional(),
-  members: Joi.array().items(Joi.string()).optional(),
-  createdBy: Joi.string().required(),
-  startDate: Joi.date().required(),
-  dueDate: Joi.date().required(),
-  scope: Joi.string().valid('Public', 'Team').default('Team'),
-  status: Joi.string().valid('To Do', 'In Progress', 'Done').default('To Do'),
-});
+const projectValidation = require('../validation/project-validation');
 
 exports.createProject = async (req, res) => {
   try {
-    const { error, value } = projectValidationSchema.validate(req.body);
+    const { error, value } =
+      projectValidation.createProjectValidationSchema.validate(req.body);
 
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -49,6 +40,53 @@ exports.createProject = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};
+
+exports.patchProject = async (req, res) => {
+  try {
+    const { pid } = req.params;
+    const { error, value } =
+      projectValidation.updateProjectValidationSchema.validate(req.body);
+
+    const { userId, ...updateData } = value;
+
+    if (error) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message:
+          'Invalid input data: ' +
+          error.details.map((d) => d.message).join(', '),
+      });
+    }
+
+    if (!Object.keys(updateData).length) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'No data provided for update',
+      });
+    }
+
+    if (!pid) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'No projectid provided',
+      });
+    }
+
+    const result = await projectService.patchProject(pid, userId, updateData);
+
+    return res.status(StatusCodes.OK).json({
+      data: result,
+      success: true,
+      message: 'Project updated succesfully',
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error: ' + err.message,
     });

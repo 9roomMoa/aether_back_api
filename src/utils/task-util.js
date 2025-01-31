@@ -34,3 +34,7 @@ exports.isInvalidDateRange = (startDate, dueDate) => {
   const due = new Date(dueDate);
   return start > due;
 };
+
+exports.isProjectCreator = async (userId, project) => {
+  return project.createdBy.toString() === userId;
+};
