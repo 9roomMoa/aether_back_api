@@ -17,7 +17,7 @@ exports.createTask = async (req, res) => {
       });
     }
 
-    const taskData = value;
+    const { userId, ...taskData } = value;
 
     if (taskUtil.isInvalidDateRange(taskData.startDate, taskData.dueDate)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -26,7 +26,7 @@ exports.createTask = async (req, res) => {
       });
     }
 
-    const task = await taskService.createTask(taskData);
+    const task = await taskService.createTask(taskData, userId);
 
     return res.status(StatusCodes.CREATED).json({
       data: task,

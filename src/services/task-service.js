@@ -4,8 +4,19 @@ const User = require('../models/User');
 const Comment = require('../models/Comment');
 const taskUtil = require('../utils/task-util');
 
-exports.createTask = async (taskData) => {
+exports.createTask = async (taskData, userId) => {
   try {
+    const isExistingProject = await taskUtil.isExistingResource(
+      Project,
+      taskData.project
+    );
+
+    if (!isExistingProject) {
+      throw new Error('No project found');
+    }
+    if (!(await taskUtil.projectScopeChecker(userId, isExistingProject))) {
+      throw new Error('you dont have privilege to access this project');
+    }
     const task = new Task(taskData);
     await task.save();
 

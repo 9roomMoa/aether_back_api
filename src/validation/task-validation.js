@@ -1,6 +1,7 @@
 const Joi = require('joi');
 
 exports.taskValidationSchema = Joi.object({
+  userId: Joi.string().required(),
   title: Joi.string().required(),
   description: Joi.string().required(),
   status: Joi.string().valid('To Do', 'In Progress', 'Done').default('To Do'),
