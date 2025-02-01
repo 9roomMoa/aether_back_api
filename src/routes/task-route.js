@@ -11,6 +11,8 @@ router.delete('/', taskController.deleteTask);
 
 router.get('/:tid/info', taskController.getTaskInfo);
 
+router.patch('/:tid/info', taskController.updateTaskInfo);
+
 router.post('/:tid/comments', taskController.createComment);
 
 router.get('/:tid/comments', taskController.getComments);
