@@ -2,22 +2,13 @@ const Joi = require('joi');
 const { StatusCodes } = require('http-status-codes');
 const taskService = require('../services/task-service');
 const taskUtil = require('../utils/task-util');
-
-const taskValidationSchema = Joi.object({
-  title: Joi.string().required(),
-  description: Joi.string().required(),
-  status: Joi.string().valid('To Do', 'In Progress', 'Done').default('To Do'),
-  priority: Joi.number().integer().min(1).max(5),
-  project: Joi.string().required(), // 프로젝트 ID
-  assignedTo: Joi.array().items(Joi.string()).optional(), // 사용자 ID
-  createdBy: Joi.string().required(), // 생성자 ID
-  startDate: Joi.date().optional(),
-  dueDate: Joi.date().optional(),
-});
+const taskValidation = require('../validation/task-validation');
 
 exports.createTask = async (req, res) => {
   try {
-    const { error, value } = taskValidationSchema.validate(req.body);
+    const { error, value } = taskValidation.taskValidationSchema.validate(
+      req.body
+    );
 
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -26,7 +17,7 @@ exports.createTask = async (req, res) => {
       });
     }
 
-    const taskData = value;
+    const { userId, ...taskData } = value;
 
     if (taskUtil.isInvalidDateRange(taskData.startDate, taskData.dueDate)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -35,7 +26,7 @@ exports.createTask = async (req, res) => {
       });
     }
 
-    const task = await taskService.createTask(taskData);
+    const task = await taskService.createTask(taskData, userId);
 
     return res.status(StatusCodes.CREATED).json({
       data: task,
@@ -53,20 +44,20 @@ exports.createTask = async (req, res) => {
 
 exports.getAllTasks = async (req, res) => {
   try {
-    const { project } = req.body;
-    if (!project) {
+    const { projectId } = req.body;
+    if (!projectId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'No Project Id',
       });
     }
 
-    const tasks = await taskService.getAllTasks(project);
+    const tasks = await taskService.getAllTasks(projectId);
 
     if (!tasks || tasks.length === 0) {
       return res.status(StatusCodes.NO_CONTENT).json({
         success: true,
-        message: 'No task found for the given project',
+        message: 'No task found for the given projectId',
         data: [],
       });
     }
@@ -93,10 +84,10 @@ exports.getAllTasks = async (req, res) => {
 
 exports.getTaskInfo = async (req, res) => {
   try {
-    const { taskId } = req.params;
+    const { tid } = req.params;
     const { userId } = req.body;
 
-    if (!taskId) {
+    if (!tid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'Task ID Omission',
@@ -109,7 +100,7 @@ exports.getTaskInfo = async (req, res) => {
         message: 'User ID Omission',
       });
     }
-    const taskInfo = await taskService.getTaskInfo(taskId, userId);
+    const taskInfo = await taskService.getTaskInfo(tid, userId);
 
     return res.status(StatusCodes.OK).json({
       data: taskInfo,

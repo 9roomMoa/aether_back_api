@@ -10,6 +10,16 @@ exports.scopeChecker = async (userId, task) => {
   }
 };
 
+exports.projectScopeChecker = async (userId, project) => {
+  if (userId === project.createdBy.toString()) {
+    return true;
+  } else if (!project.members || !Array.isArray(project.members)) {
+    return false;
+  } else {
+    return project.members.some((memberId) => memberId.toString() === userId);
+  }
+};
+
 exports.isTaskCreator = async (userId, task) => {
   return task.createdBy.toString() === userId;
 };
