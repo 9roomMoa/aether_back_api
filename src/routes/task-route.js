@@ -17,6 +17,8 @@ router.post('/:tid/comments', taskController.createComment);
 
 router.get('/:tid/comments', taskController.getComments);
 
+router.patch('/:tid/comments/:cid', taskController.updateComment);
+
 router.delete('/:tid/comments', taskController.deleteComment);
 
 router.get('/:tid/comments/search', taskController.searchComments);
