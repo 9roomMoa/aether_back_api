@@ -6,9 +6,7 @@ const taskValidation = require('../validation/task-validation');
 
 exports.createTask = async (req, res) => {
   try {
-    const { error, value } = taskValidation.taskValidationSchema.validate(
-      req.body
-    );
+    const { error, value } = taskValidation.gettingSchema.validate(req.body);
 
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -106,6 +104,34 @@ exports.getTaskInfo = async (req, res) => {
       data: taskInfo,
       success: true,
       message: 'Task Info retrieved successfully!',
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};
+
+exports.updateTaskInfo = async (req, res) => {
+  try {
+    const { tid } = req.params;
+    const { error, value } = taskValidation.updatingSchema.validate(req.body);
+    if (error) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Invalid input data: ' + error.details,
+      });
+    }
+
+    const { userId, ...taskData } = value;
+    const result = await taskService.updateTaskInfo(taskData, tid, userId);
+
+    return res.status(StatusCodes.OK).json({
+      data: result,
+      success: true,
+      message: 'Task updated successfully',
     });
   } catch (err) {
     console.error(err);

@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const Project = require('../models/Project');
-const taskUtils = require('../utils/task-util');
+const taskUtil = require('../utils/task-util');
 
 exports.createProject = async (data) => {
   try {
@@ -23,15 +23,15 @@ exports.createProject = async (data) => {
 
 exports.patchProject = async (pid, userId, data) => {
   try {
-    const isExistingProject = await taskUtils.isExistingResource(Project, pid);
+    const isExistingProject = await taskUtil.isExistingResource(Project, pid);
     if (!isExistingProject) {
       throw new Error('No project found');
     }
-    if (!(await taskUtils.isProjectCreator(userId, isExistingProject))) {
+    if (!(await taskUtil.isProjectCreator(userId, isExistingProject))) {
       throw new Error('you dont have privilege to update this project');
     }
     if (
-      taskUtils.isInvalidDateRange(
+      taskUtil.isInvalidDateRange(
         data?.startDate || isExistingProject.startDate,
         data?.dueDate || isExistingProject.dueDate
       )

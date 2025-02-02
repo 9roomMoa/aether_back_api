@@ -51,6 +51,43 @@ exports.getTaskInfo = async (tid, userId) => {
   }
 };
 
+exports.updateTaskInfo = async (taskData, taskId, userId) => {
+  try {
+    const isExistingTask = await taskUtil.isExistingResource(Task, taskId);
+    if (!isExistingTask) {
+      throw new Error('No task found');
+    }
+
+    const isAccessible = await taskUtil.scopeChecker(userId, isExistingTask);
+
+    if (!isAccessible) {
+      throw new Error('you dont have privilege to update this task');
+    }
+
+    if (
+      taskUtil.isInvalidDateRange(
+        taskData?.startDate || isExistingTask.startDate,
+        taskData?.dueDate || isExistingTask.dueDate
+      )
+    ) {
+      throw new Error('date data are invalidate');
+    }
+
+    const result = await Task.findByIdAndUpdate(
+      taskId,
+      {
+        $set: taskData,
+      },
+      { new: true, runValidators: true }
+    );
+
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error occured during updating task');
+  }
+};
+
 exports.getAllTasks = async (project) => {
   try {
     const existingProject = await Project.findById(project);
