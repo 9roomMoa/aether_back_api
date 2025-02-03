@@ -276,7 +276,7 @@ exports.updateComment = async (userId, taskId, commentId, data) => {
     if (!isExistingComment) {
       throw new Error('No comment found');
     }
-    if (!isExistingComment.commenterId.toString() === userId) {
+    if (isExistingComment.commenterId.toString() !== userId) {
       throw new Error('You dont have privilege to update this comment');
     }
 
