@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const taskController = require('../controllers/task-controller');
+const docsController = require('../controllers/docs-controller');
+const uploadMiddleware = require('../middlewares/upload');
 
 router.post('/', taskController.createTask);
 
@@ -26,5 +28,11 @@ router.get('/:tid/comments/search', taskController.searchComments);
 router.get('/:tid/managers', taskController.getManagerInfo);
 
 router.post('/:tid/managers', taskController.addManagers);
+
+router.post(
+  '/:tid/docs',
+  uploadMiddleware.uploadSingle,
+  docsController.postDocument
+);
 
 module.exports = router;

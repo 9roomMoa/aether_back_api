@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const { GridFSBucket } = require('mongodb');
 
 const Task = require('../src/models/Task'); // Task 모델 import
 const Project = require('../src/models/Project'); // Project 모델 import
@@ -16,13 +17,20 @@ const connectDB = async () => {
     const mongoURI = dbURI;
 
     // MongoDB 연결
-    await mongoose.connect(mongoURI, {
+    const conn = await mongoose.connect(mongoURI, {
       dbName: 'aether',
       // useNewUrlParser: true,
       // useUnifiedTopology: true,
     });
 
     console.log('MongoDB connected successfully!');
+
+    const bucket = new GridFSBucket(conn.connection.db, {
+      bucketName: 'documents',
+    });
+
+    console.log('✅ GridFSBucket initialized!');
+    return bucket;
 
     // 초기 데이터 삽입
     // await seedDatabase();
@@ -79,4 +87,4 @@ mongoose.connection.on('disconnected', () => {
   connectDB();
 });
 
-module.exports = connectDB;
+module.exports = { connectDB, mongoose };
