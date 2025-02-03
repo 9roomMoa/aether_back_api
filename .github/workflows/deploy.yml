@@ -39,7 +39,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ssh 9roommoa-ec2 'npm install --prefix /opt/app/'
+          ssh 9roommoa-ec2 'npm install --legacy-peer-deps --prefix /opt/app/' || ssh 9roommoa-ec2 'npm install --force --prefix /opt/app/'
 
       - name: Install PM2 Globally
         run: |
