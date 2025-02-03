@@ -263,6 +263,36 @@ exports.getComments = async (userId, taskId) => {
   }
 };
 
+exports.updateComment = async (userId, taskId, commentId, data) => {
+  try {
+    const isExistingTask = await taskUtil.isExistingResource(Task, taskId);
+    if (!isExistingTask) {
+      throw new Error('No task found');
+    }
+    const isExistingComment = await taskUtil.isExistingResource(
+      Comment,
+      commentId
+    );
+    if (!isExistingComment) {
+      throw new Error('No comment found');
+    }
+    if (isExistingComment.commenterId.toString() !== userId) {
+      throw new Error('You dont have privilege to update this comment');
+    }
+
+    const result = await Comment.findByIdAndUpdate(
+      commentId,
+      { $set: data },
+      { new: true, runValidators: true }
+    );
+
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error occured during updating comment');
+  }
+};
+
 exports.deleteComment = async (userId, taskId, commentId) => {
   try {
     const existingTask = await Task.findById(taskId);

@@ -1,8 +1,8 @@
-const Joi = require('joi');
 const { StatusCodes } = require('http-status-codes');
 const taskService = require('../services/task-service');
 const taskUtil = require('../utils/task-util');
 const taskValidation = require('../validation/task-validation');
+const commentValidation = require('../validation/comment-validation');
 
 exports.createTask = async (req, res) => {
   try {
@@ -274,16 +274,12 @@ exports.searchComments = async (req, res) => {
   }
 };
 
-const commentValidationSchema = Joi.object({
-  commenterId: Joi.string().required(),
-  content: Joi.string().required(),
-  parentId: Joi.string().optional(),
-});
-
 exports.createComment = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { error, value } = commentValidationSchema.validate(req.body);
+    const { error, value } = commentValidation.creatingSchema.validate(
+      req.body
+    );
 
     if (!tid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -341,6 +337,52 @@ exports.getComments = async (req, res) => {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error: ' + err.message,
+    });
+  }
+};
+
+exports.updateComment = async (req, res) => {
+  try {
+    const { tid, cid } = req.params;
+    const { error, value } = commentValidation.updatingSchema.validate(
+      req.body
+    );
+
+    if (!tid || !cid) {
+      console.log(tid, cid);
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'taskId or commentId omitted',
+      });
+    }
+
+    if (error) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message:
+          'Invalid input data: ' +
+          error.details.map((d) => d.message).join(','),
+      });
+    }
+
+    const { userId, ...updateData } = value;
+    const result = await taskService.updateComment(
+      userId,
+      tid,
+      cid,
+      updateData
+    );
+
+    return res.status(StatusCodes.OK).json({
+      data: result,
+      success: true,
+      message: 'Comment updated successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: true,
+      messasge: 'Internal server error: ' + err.message,
     });
   }
 };
