@@ -79,3 +79,23 @@ exports.getDocuments = async (req, res) => {
     });
   }
 };
+
+exports.downloadDocument = async (req, res) => {
+  try {
+    const { did } = req.params;
+    if (!did) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'documentId omitted',
+      });
+    }
+
+    return await docsService.downloadDocument(did, res);
+  } catch (err) {
+    console.error('❌ Error in downloadDocument Controller:', err.message);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};
