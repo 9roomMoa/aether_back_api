@@ -29,7 +29,7 @@ const connectDB = async () => {
       bucketName: 'documents',
     });
 
-    console.log('✅ GridFSBucket initialized!');
+    console.log('GridFSBucket initialized!');
     return bucket;
 
     // 초기 데이터 삽입

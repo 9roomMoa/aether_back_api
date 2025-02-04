@@ -9,7 +9,7 @@ mongoose.connection.once('open', () => {
   bucket = new GridFSBucket(mongoose.connection.db, {
     bucketName: 'documents',
   });
-  console.log('✅ GridFSBucket initialized in docsService');
+  console.log('GridFSBucket initialized in docsService');
 });
 
 exports.postDocument = async (file, taskId, userId) => {
@@ -31,7 +31,7 @@ exports.postDocument = async (file, taskId, userId) => {
         }
 
         const uploadStream = bucket.openUploadStream(file.originalname, {
-          metadata: { taskId },
+          metadata: { taskId: taskId, uploadedBy: userId },
         });
 
         uploadStream.end(file.buffer);
@@ -45,18 +45,40 @@ exports.postDocument = async (file, taskId, userId) => {
         });
 
         uploadStream.on('error', (err) => {
-          console.error('❌ GridFS Upload Error:', err.message);
+          console.error('GridFS Upload Error:', err.message);
           return reject(new Error('Error during file upload: ' + err.message));
         });
       } catch (error) {
-        console.error('❌ Error in uploadDocument function:', error.message);
+        console.error('Error in uploadDocument function:', error.message);
         return reject(
           new Error('Unexpected error in uploadDocument: ' + error.message)
         );
       }
     });
   } catch (err) {
-    console.error('❌ Error in postDocument:', err.message);
+    console.error('Error in postDocument:', err.message);
     throw new Error('Error occurred during uploading file(s): ' + err.message);
+  }
+};
+
+exports.getDocuments = async (taskId, userId) => {
+  try {
+    const isExistingTask = await taskUtil.isExistingResource(Task, taskId);
+    if (!isExistingTask) {
+      throw new Error('Invalid taskId');
+    }
+    const isAccessible = await taskUtil.scopeChecker(userId, isExistingTask);
+    if (!isAccessible) {
+      throw new Error('You dont have privilege to access this task');
+    }
+
+    const documents = await bucket
+      .find({ 'metadata.taskId': taskId })
+      .toArray();
+
+    return documents;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error occured during getting documents');
   }
 };
