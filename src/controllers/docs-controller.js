@@ -36,3 +36,46 @@ exports.postDocument = async (req, res) => {
     });
   }
 };
+
+exports.getDocuments = async (req, res) => {
+  try {
+    const { tid } = req.params;
+    const { userId } = req.body;
+
+    if (!tid) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'taskId omitted',
+      });
+    }
+
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'userId omitted',
+      });
+    }
+
+    const documents = await docsService.getDocuments(tid, userId);
+
+    if (!documents) {
+      return res.status(StatusCodes.OK).json({
+        data: [],
+        success: true,
+        message: 'No documents found',
+      });
+    }
+
+    return res.status(StatusCodes.OK).json({
+      data: documents,
+      success: true,
+      message: 'Documents retreived successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};

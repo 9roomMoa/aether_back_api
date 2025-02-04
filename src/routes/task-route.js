@@ -35,4 +35,6 @@ router.post(
   docsController.postDocument
 );
 
+router.get('/:tid/docs', docsController.getDocuments);
+
 module.exports = router;
