@@ -138,3 +138,28 @@ exports.downloadDocument = async (docsId, res) => {
     }
   }
 };
+
+exports.searchDocuments = async (taskId, userId, keyword) => {
+  try {
+    const isExistingTask = await taskUtil.isExistingResource(Task, taskId);
+    if (!isExistingTask) {
+      throw new Error('No task found');
+    }
+    const isAccessible = await taskUtil.scopeChecker(userId, isExistingTask);
+    if (!isAccessible) {
+      throw new Error('You dont have privilege to access this task');
+    }
+
+    const documents = await bucket
+      .find({
+        'metadata.taskId': taskId,
+        filename: { $regex: keyword, $options: 'i' },
+      })
+      .toArray();
+
+    return documents;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error occured during searching documents');
+  }
+};
