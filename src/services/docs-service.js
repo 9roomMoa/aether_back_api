@@ -1,5 +1,6 @@
 const { mongoose } = require('../../config/database');
 const { GridFSBucket } = require('mongodb');
+// const { ObjectId } = require('bson');
 const taskUtil = require('../utils/task-util');
 const Task = require('../models/Task');
 
@@ -80,5 +81,60 @@ exports.getDocuments = async (taskId, userId) => {
   } catch (err) {
     console.error(err);
     throw new Error('Error occured during getting documents');
+  }
+};
+
+exports.downloadDocument = async (docsId, res) => {
+  try {
+    // ✅ ObjectId 유효성 검사
+    if (!mongoose.Types.ObjectId.isValid(docsId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'Invalid document ID' });
+    }
+    const objectId = new mongoose.Types.ObjectId(docsId);
+
+    // ✅ 파일 존재 여부 확인
+    const file = await bucket.find({ _id: objectId }).toArray();
+    if (!file || file.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Document not found' });
+    }
+
+    // ✅ 다운로드 스트림 생성
+    const downloadStream = bucket.openDownloadStream(objectId);
+
+    // ✅ 다운로드 스트림 생성 및 응답 헤더 설정
+    res.set({
+      'Content-Type': file[0].contentType || 'application/octet-stream',
+      'Content-Disposition': `attachment; filename=${encodeURIComponent(file[0].filename)}`,
+    });
+
+    // ✅ 파일을 클라이언트로 스트리밍
+    downloadStream.pipe(res);
+
+    // ❌ 스트림 에러 처리 (응답 중단)
+    downloadStream.on('error', (err) => {
+      console.error('❌ GridFS Download Error:', err.message);
+      if (!res.headersSent) {
+        return res
+          .status(500)
+          .json({ success: false, message: 'Error downloading file' });
+      }
+    });
+
+    // ✅ 다운로드 완료 로깅
+    downloadStream.on('end', () => {
+      console.log(`✅ File ${file[0].filename} downloaded successfully`);
+    });
+  } catch (err) {
+    console.error('❌ Error in downloadDocument:', err.message);
+    if (!res.headersSent) {
+      return res.status(500).json({
+        success: false,
+        message: 'Error occurred during downloading document',
+      });
+    }
   }
 };

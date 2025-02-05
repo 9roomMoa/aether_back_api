@@ -10,6 +10,7 @@ const { StatusCodes } = require('http-status-codes');
 const indexRouter = require('./src/routes/index-route');
 const taskRouter = require('./src/routes/task-route');
 const projectRouter = require('./src/routes/project-route');
+const docsRouter = require('./src/routes/docs-route');
 
 dotenv.config();
 
@@ -62,6 +63,8 @@ app.use('/', indexRouter); // 라우팅 처리
 app.use('/api/tasks', taskRouter);
 
 app.use('/api/projects', projectRouter);
+
+app.use('/api/docs', docsRouter);
 
 // 에러 핸들링 미들웨어
 app.use((err, req, res, next) => {
