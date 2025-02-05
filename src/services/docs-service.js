@@ -116,7 +116,7 @@ exports.downloadDocument = async (docsId, res) => {
 
     // ❌ 스트림 에러 처리 (응답 중단)
     downloadStream.on('error', (err) => {
-      console.error('❌ GridFS Download Error:', err.message);
+      console.error('GridFS Download Error:', err.message);
       if (!res.headersSent) {
         return res
           .status(500)
@@ -126,15 +126,40 @@ exports.downloadDocument = async (docsId, res) => {
 
     // ✅ 다운로드 완료 로깅
     downloadStream.on('end', () => {
-      console.log(`✅ File ${file[0].filename} downloaded successfully`);
+      console.log(`File ${file[0].filename} downloaded successfully`);
     });
   } catch (err) {
-    console.error('❌ Error in downloadDocument:', err.message);
+    console.error('Error in downloadDocument:', err.message);
     if (!res.headersSent) {
       return res.status(500).json({
         success: false,
         message: 'Error occurred during downloading document',
       });
     }
+  }
+};
+
+exports.searchDocuments = async (taskId, userId, keyword) => {
+  try {
+    const isExistingTask = await taskUtil.isExistingResource(Task, taskId);
+    if (!isExistingTask) {
+      throw new Error('No task found');
+    }
+    const isAccessible = await taskUtil.scopeChecker(userId, isExistingTask);
+    if (!isAccessible) {
+      throw new Error('You dont have privilege to access this task');
+    }
+
+    const documents = await bucket
+      .find({
+        'metadata.taskId': taskId,
+        filename: { $regex: keyword, $options: 'i' },
+      })
+      .toArray();
+
+    return documents;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error occured during searching documents');
   }
 };

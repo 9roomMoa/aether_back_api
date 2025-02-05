@@ -99,3 +99,44 @@ exports.downloadDocument = async (req, res) => {
     });
   }
 };
+
+exports.searchDocuments = async (req, res) => {
+  try {
+    const { tid } = req.params;
+    const { keyword } = req.query;
+    const { userId } = req.body;
+
+    if (!tid) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'TaskId omitted',
+      });
+    }
+    if (!keyword) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Keyword omitted',
+      });
+    }
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'UserId omitted',
+      });
+    }
+
+    const documents = await docsService.searchDocuments(tid, userId, keyword);
+
+    return res.status(StatusCodes.OK).json({
+      data: documents,
+      success: true,
+      message: 'Documents searched successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};

@@ -37,4 +37,6 @@ router.post(
 
 router.get('/:tid/docs', docsController.getDocuments);
 
+router.get('/:tid/docs/search', docsController.searchDocuments);
+
 module.exports = router;
