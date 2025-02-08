@@ -17,15 +17,17 @@ const userSchema = new mongoose.Schema(
     },
     password: { type: String, select: false },
     isSocial: { type: Boolean, default: false },
-    socialAccounts: [socialAccountSchema],
-    validate: {
-      validator: function (value) {
-        const uniqueAccounts = new Set(
-          value.map((v) => {
-            `${v.provider}-${v.socialId}`;
-          })
-        );
-        return uniqueAccounts.size === value.length;
+    socialAccounts: {
+      type: [socialAccountSchema],
+      validate: {
+        validator: function (value) {
+          const uniqueAccounts = new Set(
+            value.map((v) => {
+              `${v.provider}-${v.socialId}`;
+            })
+          );
+          return uniqueAccounts.size === value.length;
+        },
       },
     },
     role: { type: String, enum: ['Admin', 'Member'], default: 'Member' },
