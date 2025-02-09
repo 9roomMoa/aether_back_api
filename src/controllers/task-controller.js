@@ -5,8 +5,8 @@ const taskValidation = require('../validation/task-validation');
 
 exports.createTask = async (req, res) => {
   try {
-    const { error, value } = taskValidation.gettingSchema.validate(req.body);
-
+    const { error, value } = taskValidation.creatingSchema.validate(req.body);
+    const userId = req.user.id;
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -14,7 +14,7 @@ exports.createTask = async (req, res) => {
       });
     }
 
-    const { userId, ...taskData } = value;
+    const taskData = value;
 
     if (taskUtil.isInvalidDateRange(taskData.startDate, taskData.dueDate)) {
       return res.status(StatusCodes.BAD_REQUEST).json({

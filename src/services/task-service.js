@@ -16,7 +16,7 @@ exports.createTask = async (taskData, userId) => {
     if (!(await taskUtil.projectScopeChecker(userId, isExistingProject))) {
       throw new Error('you dont have privilege to access this project');
     }
-    const task = new Task(taskData);
+    const task = new Task({ ...taskData, createdBy: userId });
     await task.save();
 
     return task;
