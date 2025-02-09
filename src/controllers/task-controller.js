@@ -6,24 +6,27 @@ const taskValidation = require('../validation/task-validation');
 exports.createTask = async (req, res) => {
   try {
     const { error, value } = taskValidation.creatingSchema.validate(req.body);
-    const userId = req.user.id;
+
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'Invalid input data,' + error.details,
       });
     }
+    const userId = req.user.id;
+    const { startDate, dueDate, taskData } = value;
 
-    const taskData = value;
-
-    if (taskUtil.isInvalidDateRange(taskData.startDate, taskData.dueDate)) {
+    if (taskUtil.isInvalidDateRange(startDate, dueDate)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'start date cannot be later than due date',
       });
     }
 
-    const task = await taskService.createTask(taskData, userId);
+    const task = await taskService.createTask(
+      { ...taskData, startDate, dueDate },
+      userId
+    );
 
     return res.status(StatusCodes.CREATED).json({
       data: task,
@@ -42,6 +45,7 @@ exports.createTask = async (req, res) => {
 exports.getAllTasks = async (req, res) => {
   try {
     const { projectId } = req.body;
+    const userId = req.user.id;
     if (!projectId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -49,7 +53,7 @@ exports.getAllTasks = async (req, res) => {
       });
     }
 
-    const tasks = await taskService.getAllTasks(projectId);
+    const tasks = await taskService.getAllTasks(projectId, userId);
 
     if (!tasks || tasks.length === 0) {
       return res.status(StatusCodes.NO_CONTENT).json({
