@@ -63,6 +63,7 @@ exports.getTaskInfo = async (tid, userId) => {
     return {
       ...existingTask,
       creator: creator.name,
+      rank: creator.rank,
     };
   } catch (err) {
     console.error(err);
