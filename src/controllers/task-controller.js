@@ -229,7 +229,7 @@ exports.addManagers = async (req, res) => {
   try {
     const { tid } = req.params;
     const { managerId } = req.body;
-    const userId = req.user?.id || '6798ac78a5d6e3f1ce9e800d';
+    const userId = req.user?.id;
 
     if (!tid || !userId || !managerId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
