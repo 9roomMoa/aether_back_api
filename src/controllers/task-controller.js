@@ -5,7 +5,7 @@ const taskValidation = require('../validation/task-validation');
 
 exports.createTask = async (req, res) => {
   try {
-    const { error, value } = taskValidation.gettingSchema.validate(req.body);
+    const { error, value } = taskValidation.creatingSchema.validate(req.body);
 
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -13,17 +13,25 @@ exports.createTask = async (req, res) => {
         message: 'Invalid input data,' + error.details,
       });
     }
-
-    const { userId, ...taskData } = value;
-
-    if (taskUtil.isInvalidDateRange(taskData.startDate, taskData.dueDate)) {
+    const userId = req.user.id;
+    const { startDate, dueDate, taskData } = value;
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User ID Omission',
+      });
+    }
+    if (taskUtil.isInvalidDateRange(startDate, dueDate)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'start date cannot be later than due date',
       });
     }
 
-    const task = await taskService.createTask(taskData, userId);
+    const task = await taskService.createTask(
+      { ...taskData, startDate, dueDate },
+      userId
+    );
 
     return res.status(StatusCodes.CREATED).json({
       data: task,
@@ -42,14 +50,20 @@ exports.createTask = async (req, res) => {
 exports.getAllTasks = async (req, res) => {
   try {
     const { projectId } = req.body;
+    const userId = req.user.id;
     if (!projectId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'No Project Id',
       });
     }
-
-    const tasks = await taskService.getAllTasks(projectId);
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User ID Omission',
+      });
+    }
+    const tasks = await taskService.getAllTasks(projectId, userId);
 
     if (!tasks || tasks.length === 0) {
       return res.status(StatusCodes.NO_CONTENT).json({
@@ -118,13 +132,22 @@ exports.updateTaskInfo = async (req, res) => {
     const { tid } = req.params;
     const { error, value } = taskValidation.updatingSchema.validate(req.body);
     if (error) {
-      res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'Invalid input data: ' + error.details,
+        message:
+          'Invalid input data: ' +
+          error.details.map((err) => err.message).join(','),
       });
     }
 
-    const { userId, ...taskData } = value;
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User ID Omission',
+      });
+    }
+    const taskData = value;
     const result = await taskService.updateTaskInfo(taskData, tid, userId);
 
     return res.status(StatusCodes.OK).json({
@@ -143,8 +166,9 @@ exports.updateTaskInfo = async (req, res) => {
 
 exports.deleteTask = async (req, res) => {
   try {
-    const { taskId, userId } = req.body;
-    if (!taskId) {
+    const { tid } = req.params;
+    const userId = req.user?.id;
+    if (!tid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'Task ID Omission',
@@ -158,7 +182,7 @@ exports.deleteTask = async (req, res) => {
       });
     }
 
-    await taskService.deleteTask(userId, taskId);
+    await taskService.deleteTask(userId, tid);
 
     return res.status(StatusCodes.OK).json({
       success: true,
@@ -176,10 +200,10 @@ exports.deleteTask = async (req, res) => {
 exports.getManagerInfo = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { userId } = req.body;
+    const userId = req.user?.id;
 
     if (!tid || !userId) {
-      res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'taskid and userid are must be required',
       });
@@ -194,7 +218,7 @@ exports.getManagerInfo = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error: ' + err.message,
     });
@@ -204,10 +228,11 @@ exports.getManagerInfo = async (req, res) => {
 exports.addManagers = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { userId, managerId } = req.body;
+    const { managerId } = req.body;
+    const userId = req.user?.id;
 
     if (!tid || !userId || !managerId) {
-      res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'taskId, userId and managerId must be required',
       });
@@ -222,7 +247,7 @@ exports.addManagers = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error: ' + err.message,
     });

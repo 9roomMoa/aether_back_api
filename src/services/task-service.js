@@ -16,13 +16,33 @@ exports.createTask = async (taskData, userId) => {
     if (!(await taskUtil.projectScopeChecker(userId, isExistingProject))) {
       throw new Error('you dont have privilege to access this project');
     }
-    const task = new Task(taskData);
+    const task = new Task({ ...taskData, createdBy: userId });
     await task.save();
 
     return task;
   } catch (err) {
     console.error(err);
     throw new Error('Error occured during creating new task');
+  }
+};
+
+exports.getAllTasks = async (project, userId) => {
+  try {
+    const existingProject = await Project.findById(project);
+    if (!existingProject) {
+      throw new Error('Invalid Project ID');
+    }
+    if (!(await taskUtil.projectScopeChecker(userId, existingProject))) {
+      throw new Error('You dont have privilege to access this project');
+    }
+    const task = await Task.find({ project: project }).select(
+      'title description status priority'
+    );
+
+    return task;
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error during getting tasks');
   }
 };
 
@@ -43,6 +63,7 @@ exports.getTaskInfo = async (tid, userId) => {
     return {
       ...existingTask,
       creator: creator.name,
+      rank: creator.rank,
     };
   } catch (err) {
     console.error(err);
@@ -84,23 +105,6 @@ exports.updateTaskInfo = async (taskData, taskId, userId) => {
   } catch (err) {
     console.error(err);
     throw new Error('Error occured during updating task');
-  }
-};
-
-exports.getAllTasks = async (project) => {
-  try {
-    const existingProject = await Project.findById(project);
-    if (!existingProject) {
-      throw new Error('Invalid Project ID');
-    }
-    const task = await Task.find({ project: project }).select(
-      'title description status priority'
-    );
-
-    return task;
-  } catch (err) {
-    console.error(err);
-    throw new Error('Error during getting tasks');
   }
 };
 

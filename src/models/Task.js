@@ -11,6 +11,9 @@ const taskSchema = new mongoose.Schema(
     },
     priority: {
       type: Number,
+      min: 1,
+      max: 5,
+      default: 5,
     },
     project: {
       type: mongoose.Schema.Types.ObjectId,
@@ -32,8 +35,8 @@ const taskSchema = new mongoose.Schema(
     dueDate: { type: Date },
     projectScope: {
       type: String,
-      enum: ['Project', 'Task'],
-      default: 'Project',
+      enum: ['Public', 'Restricted'],
+      default: 'Public',
     },
   },
   { timestamps: true }
