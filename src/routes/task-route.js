@@ -10,7 +10,7 @@ router.post('/', taskController.createTask);
 
 router.get('/', taskController.getAllTasks);
 
-router.delete('/', taskController.deleteTask);
+router.delete('/:tid', taskController.deleteTask);
 
 router.get('/:tid/info', taskController.getTaskInfo);
 

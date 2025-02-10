@@ -15,7 +15,12 @@ exports.createTask = async (req, res) => {
     }
     const userId = req.user.id;
     const { startDate, dueDate, taskData } = value;
-
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User ID Omission',
+      });
+    }
     if (taskUtil.isInvalidDateRange(startDate, dueDate)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -52,7 +57,12 @@ exports.getAllTasks = async (req, res) => {
         message: 'No Project Id',
       });
     }
-
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User ID Omission',
+      });
+    }
     const tasks = await taskService.getAllTasks(projectId, userId);
 
     if (!tasks || tasks.length === 0) {
@@ -130,7 +140,13 @@ exports.updateTaskInfo = async (req, res) => {
       });
     }
 
-    const userId = req.user?.id || '6798ac78a5d6e3f1ce9e800d';
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User ID Omission',
+      });
+    }
     const taskData = value;
     const result = await taskService.updateTaskInfo(taskData, tid, userId);
 
@@ -150,8 +166,9 @@ exports.updateTaskInfo = async (req, res) => {
 
 exports.deleteTask = async (req, res) => {
   try {
-    const { taskId, userId } = req.body;
-    if (!taskId) {
+    const { tid } = req.params;
+    const userId = req.user?.id;
+    if (!tid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'Task ID Omission',
@@ -165,7 +182,7 @@ exports.deleteTask = async (req, res) => {
       });
     }
 
-    await taskService.deleteTask(userId, taskId);
+    await taskService.deleteTask(userId, tid);
 
     return res.status(StatusCodes.OK).json({
       success: true,
@@ -183,7 +200,7 @@ exports.deleteTask = async (req, res) => {
 exports.getManagerInfo = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { userId } = req.body;
+    const userId = req.user?.id;
 
     if (!tid || !userId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -211,7 +228,8 @@ exports.getManagerInfo = async (req, res) => {
 exports.addManagers = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { userId, managerId } = req.body;
+    const { managerId } = req.body;
+    const userId = req.user?.id || '6798ac78a5d6e3f1ce9e800d';
 
     if (!tid || !userId || !managerId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
