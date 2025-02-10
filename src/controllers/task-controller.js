@@ -122,13 +122,16 @@ exports.updateTaskInfo = async (req, res) => {
     const { tid } = req.params;
     const { error, value } = taskValidation.updatingSchema.validate(req.body);
     if (error) {
-      res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'Invalid input data: ' + error.details,
+        message:
+          'Invalid input data: ' +
+          error.details.map((err) => err.message).join(','),
       });
     }
 
-    const { userId, ...taskData } = value;
+    const userId = req.user?.id || '6798ac78a5d6e3f1ce9e800d';
+    const taskData = value;
     const result = await taskService.updateTaskInfo(taskData, tid, userId);
 
     return res.status(StatusCodes.OK).json({
@@ -183,7 +186,7 @@ exports.getManagerInfo = async (req, res) => {
     const { userId } = req.body;
 
     if (!tid || !userId) {
-      res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'taskid and userid are must be required',
       });
@@ -198,7 +201,7 @@ exports.getManagerInfo = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error: ' + err.message,
     });
@@ -211,7 +214,7 @@ exports.addManagers = async (req, res) => {
     const { userId, managerId } = req.body;
 
     if (!tid || !userId || !managerId) {
-      res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'taskId, userId and managerId must be required',
       });
@@ -226,7 +229,7 @@ exports.addManagers = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error: ' + err.message,
     });
