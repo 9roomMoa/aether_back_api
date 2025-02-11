@@ -5,8 +5,9 @@ const taskController = require('../controllers/task-controller');
 const docsController = require('../controllers/docs-controller');
 const uploadMiddleware = require('../middlewares/upload');
 const commentController = require('../controllers/comment-controller');
+const authMiddleware = require('../middlewares/verify-token');
 
-router.post('/', taskController.createTask);
+router.post('/', authMiddleware.verifyToken, taskController.createTask);
 
 router.get('/', taskController.getAllTasks);
 
