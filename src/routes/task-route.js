@@ -5,39 +5,85 @@ const taskController = require('../controllers/task-controller');
 const docsController = require('../controllers/docs-controller');
 const uploadMiddleware = require('../middlewares/upload');
 const commentController = require('../controllers/comment-controller');
+const authMiddleware = require('../middlewares/verify-token');
 
-router.post('/', taskController.createTask);
+router.post('/', authMiddleware.verifyToken, taskController.createTask);
 
-router.get('/', taskController.getAllTasks);
+router.get('/', authMiddleware.verifyToken, taskController.getAllTasks);
 
-router.delete('/:tid', taskController.deleteTask);
+router.delete('/:tid', authMiddleware.verifyToken, taskController.deleteTask);
 
-router.get('/:tid/info', taskController.getTaskInfo);
+router.get(
+  '/:tid/info',
+  authMiddleware.verifyToken,
+  taskController.getTaskInfo
+);
 
-router.patch('/:tid/info', taskController.updateTaskInfo);
+router.patch(
+  '/:tid/info',
+  authMiddleware.verifyToken,
+  taskController.updateTaskInfo
+);
 
-router.post('/:tid/comments', commentController.createComment);
+router.post(
+  '/:tid/comments',
+  authMiddleware.verifyToken,
+  commentController.createComment
+);
 
-router.get('/:tid/comments', commentController.getComments);
+router.get(
+  '/:tid/comments',
+  authMiddleware.verifyToken,
+  commentController.getComments
+);
 
-router.patch('/:tid/comments/:cid', commentController.updateComment);
+router.patch(
+  '/:tid/comments/:cid',
+  authMiddleware.verifyToken,
+  commentController.updateComment
+);
 
-router.delete('/:tid/comments', commentController.deleteComment);
+router.delete(
+  '/:tid/comments',
+  authMiddleware.verifyToken,
+  commentController.deleteComment
+);
 
-router.get('/:tid/comments/search', commentController.searchComments);
+router.get(
+  '/:tid/comments/search',
+  authMiddleware.verifyToken,
+  commentController.searchComments
+);
 
-router.get('/:tid/managers', taskController.getManagerInfo);
+router.get(
+  '/:tid/managers',
+  authMiddleware.verifyToken,
+  taskController.getManagerInfo
+);
 
-router.post('/:tid/managers', taskController.addManagers);
+router.post(
+  '/:tid/managers',
+  authMiddleware.verifyToken,
+  taskController.addManagers
+);
 
 router.post(
   '/:tid/docs',
+  authMiddleware.verifyToken,
   uploadMiddleware.uploadSingle,
   docsController.postDocument
 );
 
-router.get('/:tid/docs', docsController.getDocuments);
+router.get(
+  '/:tid/docs',
+  authMiddleware.verifyToken,
+  docsController.getDocuments
+);
 
-router.get('/:tid/docs/search', docsController.searchDocuments);
+router.get(
+  '/:tid/docs/search',
+  authMiddleware.verifyToken,
+  docsController.searchDocuments
+);
 
 module.exports = router;
