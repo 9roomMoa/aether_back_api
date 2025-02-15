@@ -1,14 +1,8 @@
-const User = require('../models/User');
 const Project = require('../models/Project');
 const taskUtil = require('../utils/task-util');
 
 exports.createProject = async (data) => {
   try {
-    const isTeamMember = await User.findById(data.createdBy);
-
-    if (!isTeamMember) {
-      throw new Error('You are not in team');
-    }
     if (data.members && !Array.isArray(data.members)) {
       data.members = [data.members];
     }
