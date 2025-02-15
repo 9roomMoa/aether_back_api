@@ -4,9 +4,9 @@ const commentValidation = require('../validation/comment-validation.js');
 
 exports.searchComments = async (req, res) => {
   try {
-    const { userId } = req.body;
     const { tid } = req.params;
     const { keyword } = req.query;
+    const userId = req.user?.sub;
 
     if (!userId || !tid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -15,12 +15,12 @@ exports.searchComments = async (req, res) => {
       });
     }
 
-    if (!keyword || keyword.trim() === '') {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        success: false,
-        message: 'there is no keyword',
-      });
-    }
+    // if (!keyword || keyword.trim() === '') {
+    //   return res.status(StatusCodes.BAD_REQUEST).json({
+    //     success: false,
+    //     message: 'there is no keyword',
+    //   });
+    // }
 
     const comments = await commentService.searchComments(keyword, tid, userId);
 
@@ -52,6 +52,7 @@ exports.createComment = async (req, res) => {
     const { error, value } = commentValidation.creatingSchema.validate(
       req.body
     );
+    const userId = req.user?.sub;
 
     if (!tid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -67,7 +68,7 @@ exports.createComment = async (req, res) => {
       });
     }
 
-    const commentData = { taskId: tid, ...value };
+    const commentData = { commenterId: userId, taskId: tid, ...value };
 
     const comment = await commentService.createComment(commentData);
 
@@ -88,7 +89,7 @@ exports.createComment = async (req, res) => {
 exports.getComments = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { userId } = req.body;
+    const userId = req.user?.sub;
 
     if (!userId || !tid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -119,9 +120,9 @@ exports.updateComment = async (req, res) => {
     const { error, value } = commentValidation.updatingSchema.validate(
       req.body
     );
+    const userId = req.user?.sub;
 
     if (!tid || !cid) {
-      console.log(tid, cid);
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'taskId or commentId omitted',
@@ -137,7 +138,7 @@ exports.updateComment = async (req, res) => {
       });
     }
 
-    const { userId, ...updateData } = value;
+    const updateData = value;
     const result = await commentService.updateComment(
       userId,
       tid,
