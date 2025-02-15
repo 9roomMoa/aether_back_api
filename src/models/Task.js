@@ -6,14 +6,14 @@ const taskSchema = new mongoose.Schema(
     description: { type: String, required: true },
     status: {
       type: String,
-      enum: ['To Do', 'In Progress', 'Done'],
+      enum: ['To Do', 'In Progress', 'Done', 'Issue'],
       default: 'To Do',
     },
     priority: {
       type: Number,
-      min: 1,
-      max: 5,
-      default: 5,
+      min: 0,
+      max: 4,
+      default: 0,
     },
     project: {
       type: mongoose.Schema.Types.ObjectId,

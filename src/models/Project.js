@@ -13,9 +13,10 @@ const projectSchema = new mongoose.Schema(
     startDate: { type: Date, required: true },
     dueDate: { type: Date, required: true },
     scope: { type: String, enum: ['Public', 'Team'], default: 'Team' },
+    priority: { type: Number, min: 0, max: 4, default: 0 },
     status: {
       type: String,
-      enum: ['To Do', 'In Progress', 'Done'],
+      enum: ['To Do', 'In Progress', 'Done', 'Issue'],
       default: 'To Do',
     },
   },
