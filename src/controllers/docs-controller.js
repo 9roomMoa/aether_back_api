@@ -4,7 +4,7 @@ const docsService = require('../services/docs-service');
 exports.postDocument = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { userId } = req.body;
+    const { userId } = req.user?.sub;
 
     if (!tid || !userId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -12,7 +12,6 @@ exports.postDocument = async (req, res) => {
         message: 'TaskId or userId omitted',
       });
     }
-    console.log('✅ Received File:', req.file);
 
     if (!req.file) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -40,7 +39,7 @@ exports.postDocument = async (req, res) => {
 exports.getDocuments = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { userId } = req.body;
+    const userId = req.user?.sub;
 
     if (!tid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -83,6 +82,13 @@ exports.getDocuments = async (req, res) => {
 exports.downloadDocument = async (req, res) => {
   try {
     const { did } = req.params;
+    const userId = req.user?.sub;
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'userId omitted',
+      });
+    }
     if (!did) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -90,7 +96,9 @@ exports.downloadDocument = async (req, res) => {
       });
     }
 
-    return await docsService.downloadDocument(did, res);
+    const data = { userId, did };
+
+    return await docsService.downloadDocument(data, res);
   } catch (err) {
     console.error('❌ Error in downloadDocument Controller:', err.message);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -104,7 +112,7 @@ exports.searchDocuments = async (req, res) => {
   try {
     const { tid } = req.params;
     const { keyword } = req.query;
-    const { userId } = req.body;
+    const userId = req.user?.sub;
 
     if (!tid) {
       return res.status(StatusCodes.BAD_REQUEST).json({

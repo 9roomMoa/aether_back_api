@@ -84,15 +84,15 @@ exports.getDocuments = async (taskId, userId) => {
   }
 };
 
-exports.downloadDocument = async (docsId, res) => {
+exports.downloadDocument = async (data, res) => {
   try {
     // ✅ ObjectId 유효성 검사
-    if (!mongoose.Types.ObjectId.isValid(docsId)) {
+    if (!mongoose.Types.ObjectId.isValid(data.did)) {
       return res
         .status(400)
         .json({ success: false, message: 'Invalid document ID' });
     }
-    const objectId = new mongoose.Types.ObjectId(docsId);
+    const objectId = new mongoose.Types.ObjectId(data.did);
 
     // ✅ 파일 존재 여부 확인
     const file = await bucket.find({ _id: objectId }).toArray();
@@ -100,6 +100,13 @@ exports.downloadDocument = async (docsId, res) => {
       return res
         .status(404)
         .json({ success: false, message: 'Document not found' });
+    }
+
+    const taskId = new mongoose.Types.ObjectId(file[0].metadata.taskId);
+    const task = await Task.findById(taskId);
+
+    if (!(await taskUtil.scopeChecker(data.userId, task))) {
+      throw new Error('You dont have privilege to download this file');
     }
 
     // ✅ 다운로드 스트림 생성

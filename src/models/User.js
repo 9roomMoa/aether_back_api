@@ -33,18 +33,8 @@ const userSchema = new mongoose.Schema(
     role: { type: String, enum: ['Admin', 'Member'], default: 'Member' },
     rank: {
       type: String,
-      enum: [
-        'Intern',
-        'Junior',
-        'Mid',
-        'Senior',
-        'Lead',
-        'Manager',
-        'Director',
-        'VP',
-        'CEO',
-      ], // 직급 정의
-      default: 'Junior', // 기본값 설정
+      enum: ['인턴', '사원', '주임', '대리', '과장', '차장', '부장', '팀장'], // 직급 정의
+      default: '인턴', // 기본값 설정
     },
   },
   { timestamps: true }

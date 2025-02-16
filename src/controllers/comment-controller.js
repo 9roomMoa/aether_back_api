@@ -163,7 +163,8 @@ exports.updateComment = async (req, res) => {
 exports.deleteComment = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { userId, commentId } = req.body;
+    const { commentId } = req.body;
+    const userId = req.user?.sub;
 
     if (!tid || !userId) {
       res.status(StatusCodes.BAD_REQUEST).json({
