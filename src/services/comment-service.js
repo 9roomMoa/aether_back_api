@@ -10,7 +10,7 @@ exports.searchComments = async (keyword, taskId, userId) => {
     if (!isAccessible) {
       throw new Error('You dont have privilege to access to comments');
     }
-    console.log(keyword);
+
     const comments = await Comment.find({
       taskId: taskId,
       content: { $regex: keyword, $options: 'i' },
@@ -25,6 +25,18 @@ exports.searchComments = async (keyword, taskId, userId) => {
 
 exports.createComment = async (commentData) => {
   try {
+    const isExistingTask = await taskUtil.isExistingResource(
+      Task,
+      commentData.taskId
+    );
+    if (!isExistingTask) {
+      throw new Error('Invalid TaskId');
+    }
+    if (
+      !(await taskUtil.scopeChecker(commentData.commenterId, isExistingTask))
+    ) {
+      throw new Error('You dont have privilege to create comment');
+    }
     if (commentData.parentId) {
       const isChildComment = await Comment.findById(commentData.parentId);
       if (!isChildComment) {

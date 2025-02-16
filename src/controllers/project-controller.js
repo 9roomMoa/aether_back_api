@@ -12,12 +12,14 @@ exports.createProject = async (req, res) => {
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'Invalid input data: ' + error.details,
+        message:
+          'Invalid input data: ' +
+          error.details.map((d) => d.message).join(', '),
       });
     }
 
     const projectData = {
-      createdBy: req.user?.id || value.createdBy,
+      createdBy: req.user?.sub,
       ...value,
     };
 
@@ -52,7 +54,8 @@ exports.patchProject = async (req, res) => {
     const { error, value } =
       projectValidation.updateProjectValidationSchema.validate(req.body);
 
-    const { userId, ...updateData } = value;
+    const userId = req.user?.sub;
+    const updateData = value;
 
     if (error) {
       return res.status(StatusCodes.BAD_REQUEST).json({
