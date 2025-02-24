@@ -5,7 +5,7 @@ exports.creatingSchema = Joi.object({
   title: Joi.string().required(),
   description: Joi.string().required(),
   status: Joi.string()
-    .valid('To Do', 'In Progress', 'Done', 'Issue')
+    .valid('To Do', 'In Progress', 'Done', 'Issue', 'Hold')
     .default('To Do'),
   priority: Joi.number().integer().min(0).max(4).default(0),
   project: Joi.string().required(), // 프로젝트 ID
@@ -14,6 +14,7 @@ exports.creatingSchema = Joi.object({
   projectScope: Joi.string().valid('Public', 'Restricted').default('Public'),
   startDate: Joi.date(),
   dueDate: Joi.date(),
+  isDaily: Joi.boolean().default('false'),
 });
 
 //상태, 공개여부, 일정, 우선선위
@@ -25,4 +26,5 @@ exports.updatingSchema = Joi.object({
   startDate: Joi.date().optional(),
   dueDate: Joi.date().optional(),
   projectScope: Joi.string().valid('Public', 'Restricted').optional(),
+  isDaily: Joi.boolean().optional(),
 }).min(1);
