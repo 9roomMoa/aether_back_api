@@ -32,10 +32,14 @@ if (process.env.NODE_ENV === 'production') {
   app.use(morgan('dev')); // 개발 환경에서는 'dev'로 로깅
 }
 
+const allowedOrigin = process.env.CLIENT_ORIGIN
+  ? process.env.CLIENT_ORIGIN.split(',')
+  : ['http://localhost:3000'];
+
 // CORS 설정
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000',
+    origin: allowedOrigin,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   })
