@@ -50,9 +50,9 @@ exports.createTask = async (req, res) => {
 
 exports.getAllTasks = async (req, res) => {
   try {
-    const { projectId } = req.body;
+    const { pid } = req.params;
     const userId = req.user.sub;
-    if (!projectId) {
+    if (!pid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'No Project Id',
@@ -64,7 +64,7 @@ exports.getAllTasks = async (req, res) => {
         message: 'User ID Omission',
       });
     }
-    const tasks = await taskService.getAllTasks(projectId, userId);
+    const tasks = await taskService.getAllTasks(pid, userId);
 
     if (!tasks || tasks.length === 0) {
       return res.status(StatusCodes.NO_CONTENT).json({

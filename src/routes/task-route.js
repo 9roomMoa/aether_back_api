@@ -9,7 +9,7 @@ const authMiddleware = require('../middlewares/verify-token');
 
 router.post('/', authMiddleware.verifyToken, taskController.createTask);
 
-router.get('/', authMiddleware.verifyToken, taskController.getAllTasks);
+router.get('/:pid', authMiddleware.verifyToken, taskController.getAllTasks);
 
 router.delete('/:tid', authMiddleware.verifyToken, taskController.deleteTask);
 
