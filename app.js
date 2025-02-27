@@ -63,31 +63,30 @@ app.use(
   })
 );
 
-// ✅ Eureka 클라이언트 설정
 const client = new Eureka({
   instance: {
-    app: process.env.EUREKA_APP_NAME || 'aether-back-api', // ✅ 앱 이름 환경 변수 적용
+    app: 'aether-back-api',
     hostName: 'localhost',
     ipAddr: '127.0.0.1',
     port: {
-      $: process.env.EUREKA_PORT_NUMBER || 8083, // ✅ 포트 환경 변수 적용
-      enabled: true,
+      '$': 8083, // ✅ 올바른 포트 설정
+      '@enabled': 'true', // ✅ 포트 활성화 속성 추가
     },
-    vipAddress: process.env.EUREKA_APP_NAME || 'aether-back-api',
+    vipAddress: 'aether-back-api',
     dataCenterInfo: {
       '@class': 'com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo',
       name: 'MyOwn',
     },
   },
   eureka: {
-    host: process.env.EUREKA_HOST, // ✅ Eureka 서버 주소 환경 변수 적용
-    port: process.env.EUREKA_PORT, // ✅ Eureka 서버 포트 환경 변수 적용
+    host: '15.164.92.183',
+    port: 8761,
     servicePath: '/eureka/apps/',
     fetchRegistry: true,
     registerWithEureka: true,
     auth: {
-      user: process.env.EUREKA_USER, // ✅ Eureka 인증 ID 환경 변수 적용
-      password: process.env.EUREKA_PASSWORD, // ✅ Eureka 인증 PW 환경 변수 적용
+      user: 'admin',
+      password: 'asd092872',
     },
   },
 });
