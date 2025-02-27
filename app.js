@@ -11,7 +11,6 @@ const indexRouter = require('./src/routes/index-route');
 const taskRouter = require('./src/routes/task-route');
 const projectRouter = require('./src/routes/project-route');
 const docsRouter = require('./src/routes/docs-route');
-const { allow } = require('joi');
 
 dotenv.config();
 
