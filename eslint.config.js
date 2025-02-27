@@ -31,6 +31,7 @@ module.exports = [
       'no-console': 'off',
       indent: ['error', 2],
       quotes: ['error', 'single'],
+      'quote-props': ['error', 'always'],
       semi: ['error', 'always'],
       'no-unused-vars': ['warn'],
       'no-undef': ['error'],
