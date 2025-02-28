@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const { connectDB } = require('.//config/database');
 const { StatusCodes } = require('http-status-codes');
-const { Eureka } = require('eureka-js-client');
+const Eureka = require('eureka-js-client').Eureka;
 
 const indexRouter = require('./src/routes/index-route');
 const taskRouter = require('./src/routes/task-route');
@@ -63,35 +63,40 @@ app.use(
   })
 );
 
+
+
 const client = new Eureka({
   instance: {
-    app: 'aether-back-api',
-    hostName: 'localhost',
-    ipAddr: '127.0.0.1',
+    app: process.env.EUREKA_APP_NAME, // 서비스 이름
+    hostName: 'localhost', // 호스트명
+    ipAddr: '127.0.0.1', // IP 주소
     port: {
-      '$': 8083, // ✅ 올바른 포트 설정
-      '@enabled': 'true', // ✅ 포트 활성화 속성 추가
+      '$': process.env.EUREKA_PORT_NUMBER, // 서비스 포트 (고정)
+      '@enabled': true,
     },
-    vipAddress: 'aether-back-api',
+    vipAddress: process.env.EUREKA_VIP_ADDRESS,
     dataCenterInfo: {
       '@class': 'com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo',
       name: 'MyOwn',
     },
   },
   eureka: {
-    host: '15.164.92.183',
-    port: 8761,
+    host: process.env.EUREKA_HOST, // 유레카 서버 IP
+    port: process.env.EUREKA_PORT, // 유레카 서버 포트
     servicePath: '/eureka/apps/',
     fetchRegistry: true,
     registerWithEureka: true,
-    auth: {
-      user: 'admin',
-      password: 'asd092872',
-    },
+  },
+  requestMiddleware: (requestOpts, done) => {
+    requestOpts.auth = {
+      user: process.env.EUREKA_USER,
+      password: process.env.EUREKA_PASSWORD,
+    };
+    done(requestOpts);
   },
 });
 
-// ✅ Eureka 서버에 등록
+// ✅ Eureka 등록 시작
 client.start((error) => {
   if (error) {
     console.error('❌ Eureka 등록 실패:', error);
