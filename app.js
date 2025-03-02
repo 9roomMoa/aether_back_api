@@ -12,6 +12,7 @@ const indexRouter = require('./src/routes/index-route');
 const taskRouter = require('./src/routes/task-route');
 const projectRouter = require('./src/routes/project-route');
 const docsRouter = require('./src/routes/docs-route');
+const userRouter = require('./src/routes/user-route');
 
 dotenv.config();
 
@@ -63,15 +64,13 @@ app.use(
   })
 );
 
-
-
 const client = new Eureka({
   instance: {
     app: process.env.EUREKA_APP_NAME, // 서비스 이름
     hostName: process.env.HOST_NAME, // 호스트명
     ipAddr: process.env.IP, // IP 주소
     port: {
-      '$': process.env.EUREKA_PORT_NUMBER, // 서비스 포트 (고정)
+      $: process.env.EUREKA_PORT_NUMBER, // 서비스 포트 (고정)
       '@enabled': true,
     },
     vipAddress: process.env.EUREKA_VIP_ADDRESS,
@@ -112,6 +111,8 @@ app.use('/api/tasks', taskRouter);
 app.use('/api/projects', projectRouter);
 
 app.use('/api/docs', docsRouter);
+
+app.use('/api/users', userRouter);
 
 // 에러 핸들링 미들웨어
 app.use((err, req, res, next) => {
