@@ -5,7 +5,7 @@ exports.getUserInfoByKeyword = async (req, res) => {
   try {
     const userId = req.user?.sub;
     const { keyword } = req.query;
-    const { projectId } = req.body;
+    const projectId = req.params.pid;
 
     if (!userId)
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -25,7 +25,7 @@ exports.getUserInfoByKeyword = async (req, res) => {
       projectId,
       keyword
     );
-    if (!userList) {
+    if (!userList || userList.length === 0) {
       return res.status(StatusCodes.NO_CONTENT).json({
         success: true,
         message: 'No member found',
@@ -48,7 +48,7 @@ exports.getUserInfoByKeyword = async (req, res) => {
     if (err.message === 'You dont have privilege to access this project') {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         success: false,
-        message: erro.message,
+        message: err.message,
       });
     }
 
