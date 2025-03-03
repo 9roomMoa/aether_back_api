@@ -63,15 +63,13 @@ app.use(
   })
 );
 
-
-
 const client = new Eureka({
   instance: {
     app: process.env.EUREKA_APP_NAME, // 서비스 이름
     hostName: process.env.HOST_NAME, // 호스트명
     ipAddr: process.env.IP, // IP 주소
     port: {
-      '$': process.env.EUREKA_PORT_NUMBER, // 서비스 포트 (고정)
+      $: process.env.EUREKA_PORT_NUMBER, // 서비스 포트 (고정)
       '@enabled': true,
     },
     vipAddress: process.env.EUREKA_VIP_ADDRESS,

@@ -30,9 +30,9 @@ exports.isCommentCreator = async (userId, comment) => {
 
 exports.isExistingResource = async (Model, id) => {
   const resource = await Model.findById(id);
-  if (!resource) {
-    throw new Error(`invalid ${Model} id`);
-  }
+  // if (!resource) {
+  //   throw new Error(`invalid ${Model} id`);
+  // }
   return resource;
 };
 
