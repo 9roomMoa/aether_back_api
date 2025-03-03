@@ -103,7 +103,7 @@ client.start((error) => {
   }
 });
 
-app.use('/', indexRouter); // 라우팅 처리
+app.use('/api', indexRouter); // 라우팅 처리
 
 app.use('/api/tasks', taskRouter);
 
