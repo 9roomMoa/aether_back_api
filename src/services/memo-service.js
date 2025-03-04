@@ -11,3 +11,12 @@ exports.createMemo = async (userId, data) => {
     throw err;
   }
 };
+
+exports.getMemo = async (userId) => {
+  try {
+    const memo = await Memo.find({ createdBy: userId });
+    return memo;
+  } catch (err) {
+    throw err;
+  }
+};

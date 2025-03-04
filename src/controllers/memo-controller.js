@@ -34,3 +34,34 @@ exports.createMemo = async (req, res) => {
     });
   }
 };
+
+exports.getMemo = async (req, res) => {
+  try {
+    const userId = req.user?.sub;
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User ID Omission',
+      });
+    }
+    const memoList = await memoService.getMemo(userId);
+
+    if (!memoList || memoList.length() === 0) {
+      return res.status(StatusCodes.NO_CONTENT).json({
+        data: [],
+        success: true,
+        message: 'No Memo found',
+      });
+    }
+    return res.status(StatusCodes.OK).json({
+      data: memoList,
+      success: true,
+      message: 'Memo retrieved successfully',
+    });
+  } catch (err) {
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Internal server error: ' + err.message,
+    });
+  }
+};

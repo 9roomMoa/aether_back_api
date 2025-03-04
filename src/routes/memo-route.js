@@ -6,4 +6,6 @@ const authMiddleware = require('../middlewares/verify-token.js');
 
 router.post('/', authMiddleware.verifyToken, memoController.createMemo);
 
+router.get('/', authMiddleware.verifyToken, memoController.getMemo);
+
 module.exports = router;
