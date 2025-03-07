@@ -12,6 +12,7 @@ const indexRouter = require('./src/routes/index-route');
 const taskRouter = require('./src/routes/task-route');
 const projectRouter = require('./src/routes/project-route');
 const docsRouter = require('./src/routes/docs-route');
+const memoRouter = require('./src/routes/memo-route');
 
 dotenv.config();
 
@@ -41,7 +42,7 @@ const allowedOrigin = process.env.CLIENT_ORIGIN
 app.use(
   cors({
     origin: allowedOrigin,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   })
 );
@@ -103,13 +104,15 @@ client.start((error) => {
   }
 });
 
-app.use('/', indexRouter); // 라우팅 처리
+app.use('/api', indexRouter); // 라우팅 처리
 
 app.use('/api/tasks', taskRouter);
 
 app.use('/api/projects', projectRouter);
 
 app.use('/api/docs', docsRouter);
+
+app.use('/api/memo', memoRouter);
 
 // 에러 핸들링 미들웨어
 app.use((err, req, res, next) => {
