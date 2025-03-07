@@ -46,7 +46,7 @@ exports.getMemo = async (req, res) => {
     }
     const memoList = await memoService.getMemo(userId);
 
-    if (!memoList || memoList.length() === 0) {
+    if (!memoList || memoList.length === 0) {
       return res.status(StatusCodes.NO_CONTENT).json({
         data: [],
         success: true,
