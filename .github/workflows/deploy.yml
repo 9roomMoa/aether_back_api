@@ -31,23 +31,23 @@ jobs:
           EC2_IP: ${{ secrets.EC2_IP }}
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Copy Workspace
+      - name: Sync Workspace to EC2 (Optimized)
         run: |
-          ssh 9roommoa-ec2 'sudo mkdir -p /opt/app'
+          ssh 9roommoa-ec2 'mkdir -p /opt/app'
           ssh 9roommoa-ec2 'sudo chown ubuntu:ubuntu /opt/app'
-          scp -r ./[!.]* 9roommoa-ec2:/opt/app
+          rsync -avz --delete --exclude='.git' --exclude='node_modules' ./ 9roommoa-ec2:/opt/app/
 
-      - name: Install dependencies
+      - name: Install dependencies if needed
         run: |
-          ssh 9roommoa-ec2 'npm install --legacy-peer-deps --prefix /opt/app/' || ssh 9roommoa-ec2 'npm install --force --prefix /opt/app/'
+          ssh 9roommoa-ec2 'cd /opt/app && if [ -f package-lock.json ]; then npm ci; else npm install --legacy-peer-deps; fi'
 
-      - name: Install PM2 Globally
+      - name: Ensure PM2 is Installed
         run: |
-          ssh 9roommoa-ec2 'sudo npm install -g pm2'
+          ssh 9roommoa-ec2 'if ! command -v pm2 &> /dev/null; then sudo npm install -g pm2; fi'
 
-      - name: Start Application with PM2
+      - name: Restart Application with PM2 (if running)
         run: |
-          ssh 9roommoa-ec2 'pm2 start /opt/app/app.js --name "9roommoa"'
+          ssh 9roommoa-ec2 'cd /opt/app && if pm2 list | grep -q "9roommoa"; then pm2 reload 9roommoa; else pm2 start app.js --name "9roommoa"; fi'
 
       - name: Save PM2 Process List
         run: |
