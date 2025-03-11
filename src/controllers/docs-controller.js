@@ -4,7 +4,7 @@ const docsService = require('../services/docs-service');
 exports.postDocument = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { userId } = req.user?.sub;
+    const userId = req.user?.sub;
 
     if (!tid || !userId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
