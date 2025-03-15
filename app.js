@@ -44,6 +44,7 @@ app.use(
     origin: allowedOrigin,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
+    exposedHeaders: ['Content-Disposition'],
   })
 );
 
