@@ -28,4 +28,5 @@ exports.updatingSchema = Joi.object({
   projectScope: Joi.string().valid('Public', 'Restricted').optional(),
   isDaily: Joi.boolean().optional(),
   description: Joi.string().optional(),
+  assignedTo: Joi.array().items(Joi.string()).optional(), // 사용자 ID
 }).min(1);
