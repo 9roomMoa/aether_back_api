@@ -35,9 +35,10 @@ exports.getAllTasks = async (project, userId) => {
     if (!(await taskUtil.projectScopeChecker(userId, existingProject))) {
       throw new Error('You dont have privilege to access this project');
     }
-    const task = await Task.find({ project: project }).select(
-      'title description status priority'
-    );
+    const task = await Task.find({
+      project: project,
+      $or: [{ createdBy: userId }, { assignedTo: { $in: [userId] } }],
+    }).select('title description status priority');
 
     return task;
   } catch (err) {
