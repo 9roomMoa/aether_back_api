@@ -1,3 +1,4 @@
+const { required } = require('joi');
 const mongoose = require('mongoose');
 
 const NotificationSchema = mongoose.Schema(
@@ -18,6 +19,24 @@ const NotificationSchema = mongoose.Schema(
         'comment_added',
         'document_uploaded',
       ],
+    },
+    relatedTask: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Task',
+      default: null,
+    },
+    relatedComment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
+      default: null,
+    },
+    relatedDocument: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
+    isRead: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

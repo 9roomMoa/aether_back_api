@@ -10,6 +10,14 @@ exports.getNotifications = async (req, res) => {
         message: 'User ID Omission',
       });
     }
+
+    const notifications = await notiService.getNotifications(userId);
+
+    return res.status(StatusCodes.OK).json({
+      data: notifications,
+      success: true,
+      meessage: 'Notifications retrieved successfully',
+    });
   } catch (err) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
