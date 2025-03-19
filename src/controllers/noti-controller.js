@@ -1,9 +1,11 @@
 const { StatusCodes } = require('http-status-codes');
 const notiService = require('../services/noti-service');
+const notiValidation = require('../validation/notification-validation');
 
 exports.getNotifications = async (req, res) => {
   try {
     const userId = req.user?.sub;
+
     if (!userId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,

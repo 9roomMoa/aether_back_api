@@ -4,7 +4,11 @@ const mongoose = require('mongoose');
 const NotificationSchema = mongoose.Schema(
   {
     message: { type: String, required: true },
-    sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
     receiver: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -18,6 +22,7 @@ const NotificationSchema = mongoose.Schema(
         'task_deadline',
         'comment_added',
         'document_uploaded',
+        'project_added',
       ],
     },
     relatedTask: {
