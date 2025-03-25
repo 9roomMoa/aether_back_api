@@ -1,4 +1,5 @@
 const Task = require('../models/Task');
+const User = require('../models/User');
 const Comment = require('../models/Comment');
 const taskUtil = require('../utils/task-util');
 
@@ -14,6 +15,9 @@ exports.searchComments = async (keyword, taskId, userId) => {
     const comments = await Comment.find({
       taskId: taskId,
       content: { $regex: keyword, $options: 'i' },
+    }).populate({
+      path: 'commenterId',
+      select: 'name',
     });
 
     return comments;
@@ -67,6 +71,10 @@ exports.getComments = async (userId, taskId) => {
     }
 
     const comments = await Comment.find({ taskId })
+      .populate({
+        path: 'commenterId',
+        select: 'name',
+      })
       .sort({ createdAt: 1 })
       .lean();
 
@@ -74,6 +82,7 @@ exports.getComments = async (userId, taskId) => {
 
     comments.forEach((comment) => {
       comment.replies = [];
+      // comment.commenterName = User.findById(comment.commenterId).select('name');
       commentMap[comment._id] = comment;
     });
 
