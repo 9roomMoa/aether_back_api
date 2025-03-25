@@ -2,7 +2,6 @@ const Task = require('../models/Task');
 const User = require('../models/User');
 const Comment = require('../models/Comment');
 const taskUtil = require('../utils/task-util');
-const { select } = require('nunjucks/src/filters');
 
 exports.searchComments = async (keyword, taskId, userId) => {
   try {
@@ -16,6 +15,9 @@ exports.searchComments = async (keyword, taskId, userId) => {
     const comments = await Comment.find({
       taskId: taskId,
       content: { $regex: keyword, $options: 'i' },
+    }).populate({
+      path: 'commenterId',
+      select: 'name',
     });
 
     return comments;
