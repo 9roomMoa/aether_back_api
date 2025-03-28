@@ -1,6 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
 const notiService = require('../services/noti-service');
-const notiValidation = require('../validation/notification-validation');
 
 exports.getNotifications = async (req, res) => {
   try {

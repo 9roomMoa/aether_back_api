@@ -3,10 +3,8 @@ const taskUtil = require('../utils/task-util');
 exports.getNotifications = async (userId) => {
   try {
     const [notifications, unreadCount] = Promise.all([
-      Notification.find({ receiver: userId })
-        .sort({ createdAt: -1 })
-        .skip(skip),
-      Notification.countDocuments({ isRead: false, receiver: userId }),
+      await Notification.find({ receiver: userId }).sort({ createdAt: -1 }),
+      await Notification.countDocuments({ isRead: false, receiver: userId }),
     ]);
 
     return {
