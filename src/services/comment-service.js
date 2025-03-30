@@ -1,6 +1,8 @@
 const Task = require('../models/Task');
 const Comment = require('../models/Comment');
 const taskUtil = require('../utils/task-util');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 exports.searchComments = async (keyword, taskId, userId) => {
   try {
@@ -46,6 +48,23 @@ exports.createComment = async (commentData) => {
 
     const comment = new Comment(commentData);
     await comment.save();
+
+    const user = await User.findById(commentData.commenterId);
+    const tasks = await Task.findById(commentData.taskId).select('assignedTo');
+
+    const notifications = tasks.assignedTo
+      .filter((uid) => uid.toString() !== commentData.commenterId.toString())
+      .map((uid) => ({
+        message: `${user.name}님께서 코멘트를 남기셨습니다.`,
+        receiver: uid,
+        sender: commentData.commenterId,
+        noticeType: 'comment_added',
+        relatedComment: comment._id,
+      }));
+
+    if (notifications.length > 0) {
+      await Notification.insertMany(notifications);
+    }
 
     return comment;
   } catch (err) {
