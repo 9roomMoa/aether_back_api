@@ -1,6 +1,7 @@
 const Project = require('../models/Project');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const taskUtil = require('../utils/task-util');
 
 exports.createTask = async (taskData, userId) => {
@@ -18,6 +19,21 @@ exports.createTask = async (taskData, userId) => {
     }
     const task = new Task({ ...taskData, createdBy: userId });
     await task.save();
+
+    if (Array.isArray(task.assignedTo) && task.assignedTo.length > 0) {
+      const notifications = task.assignedTo
+        .filter((uid) => uid.toString() !== userId.toString())
+        .map((uid) => ({
+          message: `${task.title} 업무가 할당되었습니다.`,
+          receiver: uid,
+          sender: userId,
+          noticeType: 'task_assigned',
+          relatedTask: task._id,
+        }));
+
+      if (notifications.length > 0)
+        await Notification.insertMany(notifications);
+    }
 
     return task;
   } catch (err) {
@@ -94,7 +110,7 @@ exports.updateTaskInfo = async (taskData, taskId, userId) => {
       throw new Error('date data are invalidate');
     }
 
-    const result = await Task.findByIdAndUpdate(
+    const task = await Task.findByIdAndUpdate(
       taskId,
       {
         $set: taskData,
@@ -102,7 +118,23 @@ exports.updateTaskInfo = async (taskData, taskId, userId) => {
       { new: true, runValidators: true }
     );
 
-    return result;
+    if (Array.isArray(task.assignedTo) && task.assignedTo.length > 0) {
+      const notifications = task.assignedTo
+        .filter((uid) => uid.toString !== userId.toString)
+        .map((uid) => ({
+          message: `${task.title} 업무가 업데이트 되었습니다.`,
+          receiver: uid,
+          sender: userId,
+          noticeType: 'task_updated',
+          relatedTask: task._id,
+        }));
+
+      if (notifications.length > 0) {
+        await Notification.insertMany(notifications);
+      }
+    }
+
+    return task;
   } catch (err) {
     console.error(err);
     throw new Error('Error occured during updating task');
@@ -171,13 +203,30 @@ exports.addManagers = async (taskId, userId, managerId) => {
     }
     await taskUtil.isExistingResource(User, managerId);
 
-    const updatedTask = Task.findByIdAndUpdate(
+    const alreadyAssigned = task.assignedTo.map((uid) => uid.toString());
+
+    const updatedTask = await Task.findByIdAndUpdate(
       taskId,
       {
         $addToSet: { assignedTo: managerId },
       },
       { new: true }
     );
+
+    if (
+      !alreadyAssigned.includes(managerId.toString()) &&
+      updatedTask.assignedTo.length > 0
+    ) {
+      const notification = {
+        message: `${updatedTask.title} 업무가 할당되었습니다.`,
+        receiver: managerId,
+        sender: userId,
+        noticeType: 'task_assigned',
+        relatedTask: updatedTask._id,
+      };
+
+      await Notification.create(notification);
+    }
 
     return updatedTask;
   } catch (err) {

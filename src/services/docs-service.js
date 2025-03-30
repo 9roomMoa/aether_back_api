@@ -3,6 +3,7 @@ const { GridFSBucket } = require('mongodb');
 // const { ObjectId } = require('bson');
 const taskUtil = require('../utils/task-util');
 const Task = require('../models/Task');
+const Notification = require('../models/Notification');
 
 let bucket;
 
@@ -37,12 +38,38 @@ exports.postDocument = async (file, taskId, userId) => {
 
         uploadStream.end(file.buffer);
 
-        uploadStream.on('finish', () => {
-          resolve({
-            success: true,
-            message: 'Document uploaded successfully',
-            fileId: uploadStream.id,
-          });
+        uploadStream.on('finish', async () => {
+          try {
+            const task = await Task.findById(taskId).select('assignedTo title');
+
+            const notifications = task.assignedTo
+              .filter((uid) => uid.toString() !== userId.toString())
+              .map((uid) => ({
+                message: `[${task.title}] 업무에 ${file.originalname} 문서가 업로드 되었습니다.`,
+                receiver: uid,
+                sender: userId,
+                noticeType: 'document_uploaded',
+                relatedTask: taskId,
+                relatedDocument: uploadStream.id,
+              }));
+
+            if (notifications.length > 0) {
+              await Notification.insertMany(notifications);
+            }
+
+            resolve({
+              success: true,
+              message: 'Document uploaded successfully',
+              fileId: uploadStream.id,
+            });
+          } catch (err) {
+            console.error(err.message);
+            resolve({
+              success: true,
+              message: 'Document uploaded, but failed to notify users',
+              fileId: uploadStream.id,
+            });
+          }
         });
 
         uploadStream.on('error', (err) => {
