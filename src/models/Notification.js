@@ -22,7 +22,6 @@ const NotificationSchema = mongoose.Schema(
         'task_deadline',
         'comment_added',
         'document_uploaded',
-        'project_added',
       ],
     },
     relatedTask: {
