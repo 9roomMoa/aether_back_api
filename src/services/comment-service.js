@@ -2,7 +2,6 @@ const Task = require('../models/Task');
 const User = require('../models/User');
 const Comment = require('../models/Comment');
 const taskUtil = require('../utils/task-util');
-const User = require('../models/User');
 const Notification = require('../models/Notification');
 
 exports.searchComments = async (keyword, taskId, userId) => {
