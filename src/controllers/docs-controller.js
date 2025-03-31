@@ -13,17 +13,19 @@ exports.postDocument = async (req, res) => {
       });
     }
 
-    if (!req.file) {
+    if (!req.files || req.files.length === 0) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'No file provided',
+        message: 'No files provided',
       });
     }
 
-    const document = await docsService.postDocument(req.file, tid, userId);
+    const documents = await Promise.all(
+      req.files.map((file) => docsService.postDocument(file, tid, userId))
+    );
 
     return res.status(StatusCodes.CREATED).json({
-      data: document,
+      data: documents,
       success: true,
       message: 'File(s) uploaded successfully',
     });

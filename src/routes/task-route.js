@@ -70,7 +70,7 @@ router.post(
 router.post(
   '/:tid/docs',
   authMiddleware.verifyToken,
-  uploadMiddleware.uploadSingle,
+  uploadMiddleware.uploadMultiple,
   docsController.postDocument
 );
 
