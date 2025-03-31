@@ -6,5 +6,6 @@ const upload = multer({ storage });
 
 // ✅ 단일 파일 업로드 설정 (필드명: 'file')
 module.exports = {
-  uploadSingle: upload.single('file'),
+  // uploadSingle: upload.single('file'),
+  uploadMultiple: upload.array('files', 5),
 };
