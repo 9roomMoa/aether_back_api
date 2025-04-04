@@ -229,17 +229,22 @@ exports.getManagerInfo = async (req, res) => {
 exports.addManagers = async (req, res) => {
   try {
     const { tid } = req.params;
-    const { managerId } = req.body;
+    const { managerId, projectId } = req.body;
     const userId = req.user?.sub;
 
     if (!tid || !userId || !managerId) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'taskId, userId and managerId must be required',
+        message: 'taskId, userId, projectId and managerId must be required',
       });
     }
 
-    const result = await taskService.addManagers(tid, userId, managerId);
+    const result = await taskService.addManagers(
+      tid,
+      projectId,
+      userId,
+      managerId
+    );
 
     return res.status(StatusCodes.OK).json({
       data: result,

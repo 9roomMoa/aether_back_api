@@ -58,11 +58,13 @@ exports.createComment = async (commentData) => {
     const notifications = tasks.assignedTo
       .filter((uid) => uid.toString() !== commentData.commenterId.toString())
       .map((uid) => ({
-        message: `${user.name}님께서 코멘트를 남기셨습니다.`,
+        project: isExistingTask.project,
+        message: `${user.name}님께서 [${isExistingTask.title}] 업무에 코멘트를 남기셨습니다.`,
         receiver: uid,
         sender: commentData.commenterId,
         noticeType: 'comment_added',
         relatedComment: comment._id,
+        relatedTask: commentData.taskId,
       }));
 
     if (notifications.length > 0) {
@@ -138,6 +140,20 @@ exports.updateComment = async (userId, taskId, commentId, data) => {
     if (isExistingComment.commenterId.toString() !== userId) {
       throw new Error('You dont have privilege to update this comment');
     }
+    const user = await User.findById(userId).select('name');
+
+    const members = [...isExistingTask.assignedTo, isExistingTask.createdBy];
+    const notifications = members
+      .filter((uid) => uid.toString() !== userId)
+      .map((uid) => ({
+        project: isExistingTask.project,
+        message: `${user.name}님이 [${isExistingTask.title}] 업무의 코멘트를 수정하였습니다.`,
+        receiver: uid,
+        sender: userId,
+        noticeType: 'comment_updated',
+        relatedComment: commentId,
+        relatedTask: taskId,
+      }));
 
     const result = await Comment.findByIdAndUpdate(
       commentId,

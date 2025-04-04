@@ -24,7 +24,8 @@ exports.createTask = async (taskData, userId) => {
       const notifications = task.assignedTo
         .filter((uid) => uid.toString() !== userId.toString())
         .map((uid) => ({
-          message: `${task.title} 업무가 할당되었습니다.`,
+          project: taskData.project,
+          message: `[${task.title}] 업무가 할당되었습니다.`,
           receiver: uid,
           sender: userId,
           noticeType: 'task_assigned',
@@ -122,7 +123,8 @@ exports.updateTaskInfo = async (taskData, taskId, userId) => {
       const notifications = task.assignedTo
         .filter((uid) => uid.toString !== userId.toString)
         .map((uid) => ({
-          message: `${task.title} 업무가 업데이트 되었습니다.`,
+          project: taskData.project,
+          message: `[${task.title}] 업무가 업데이트 되었습니다.`,
           receiver: uid,
           sender: userId,
           noticeType: 'task_updated',
@@ -193,7 +195,7 @@ exports.getManagerInfo = async (userId, taskId) => {
   }
 };
 
-exports.addManagers = async (taskId, userId, managerId) => {
+exports.addManagers = async (taskId, projectId, userId, managerId) => {
   try {
     const task = await taskUtil.isExistingResource(Task, taskId);
     await taskUtil.isExistingResource(User, userId);
@@ -218,7 +220,8 @@ exports.addManagers = async (taskId, userId, managerId) => {
       updatedTask.assignedTo.length > 0
     ) {
       const notification = {
-        message: `${updatedTask.title} 업무가 할당되었습니다.`,
+        project: projectId,
+        message: `[${updatedTask.title}] 업무가 할당되었습니다.`,
         receiver: managerId,
         sender: userId,
         noticeType: 'task_assigned',

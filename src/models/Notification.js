@@ -1,8 +1,12 @@
-const { required } = require('joi');
 const mongoose = require('mongoose');
 
 const NotificationSchema = mongoose.Schema(
   {
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project',
+      required: true,
+    },
     message: { type: String, required: true },
     sender: {
       type: mongoose.Schema.Types.ObjectId,
@@ -21,6 +25,7 @@ const NotificationSchema = mongoose.Schema(
         'task_updated',
         'task_deadline',
         'comment_added',
+        'comment_updated',
         'document_uploaded',
       ],
     },
