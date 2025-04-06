@@ -16,7 +16,7 @@ const projectSchema = new mongoose.Schema(
     priority: { type: Number, min: 0, max: 4, default: 0 },
     status: {
       type: String,
-      enum: ['To Do', 'In Progress', 'Done', 'Issue'],
+      enum: ['To Do', 'In Progress', 'Done', 'Issue', 'Hold'],
       default: 'To Do',
     },
   },
