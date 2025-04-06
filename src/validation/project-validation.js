@@ -8,14 +8,16 @@ exports.createProjectValidationSchema = Joi.object({
   dueDate: Joi.date().required(),
   scope: Joi.string().valid('Public', 'Team').default('Team'),
   status: Joi.string()
-    .valid('To Do', 'In Progress', 'Done', 'Issue')
+    .valid('To Do', 'In Progress', 'Done', 'Issue', 'Hold')
     .default('To Do'),
   priority: Joi.number().integer().min(0).max(4).default(0),
 });
 
 exports.updateProjectValidationSchema = Joi.object({
+  name: Joi.string().optional(),
+  description: Joi.string().optional(),
   status: Joi.string()
-    .valid('To Do', 'In Progress', 'Done', 'Issue')
+    .valid('To Do', 'In Progress', 'Done', 'Issue', 'Hold')
     .optional(),
   scope: Joi.string().valid('Public', 'Team'),
   startDate: Joi.date().optional(),
