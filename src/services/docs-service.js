@@ -4,6 +4,7 @@ const { GridFSBucket } = require('mongodb');
 const taskUtil = require('../utils/task-util');
 const Task = require('../models/Task');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
 
 let bucket;
 
@@ -104,7 +105,27 @@ exports.getDocuments = async (taskId, userId) => {
       .find({ 'metadata.taskId': taskId })
       .toArray();
 
-    return documents;
+    const uploaderIds = documents
+      .map((doc) => doc.metadata?.uploadedBy?.toString())
+      .filter((id) => id);
+
+    const users = await User.find({ _id: { $in: uploaderIds } }).select('name');
+
+    const userMap = {};
+    users.forEach((user) => {
+      userMap[user._id.toString()] = user.name;
+    });
+
+    const docsWithUploader = documents.map((doc) => {
+      const uploaderId = doc.metadata?.uploadedBy?.toString();
+      const uploaderName = userMap[uploaderId] || 'Unknown';
+      return {
+        ...doc,
+        uploaderName,
+      };
+    });
+
+    return docsWithUploader;
   } catch (err) {
     console.error(err);
     throw new Error('Error occured during getting documents');
