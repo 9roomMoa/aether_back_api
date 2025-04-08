@@ -20,21 +20,21 @@ exports.createTask = async (taskData, userId) => {
     const task = new Task({ ...taskData, createdBy: userId });
     await task.save();
 
-    if (Array.isArray(task.assignedTo) && task.assignedTo.length > 0) {
-      const notifications = task.assignedTo
-        .filter((uid) => uid.toString() !== userId.toString())
-        .map((uid) => ({
-          project: taskData.project,
-          message: `[${task.title}] 업무가 할당되었습니다.`,
-          receiver: uid,
-          sender: userId,
-          noticeType: 'task_assigned',
-          relatedTask: task._id,
-        }));
+    // if (Array.isArray(task.assignedTo) && task.assignedTo.length > 0) {
+    //   const notifications = task.assignedTo
+    //     .filter((uid) => uid.toString() !== userId.toString())
+    //     .map((uid) => ({
+    //       project: taskData.project,
+    //       message: `[${task.title}] 업무가 할당되었습니다.`,
+    //       receiver: uid,
+    //       sender: userId,
+    //       noticeType: 'task_assigned',
+    //       relatedTask: task._id,
+    //     }));
 
-      if (notifications.length > 0)
-        await Notification.insertMany(notifications);
-    }
+    //   if (notifications.length > 0)
+    //     await Notification.insertMany(notifications);
+    // }
 
     return task;
   } catch (err) {
@@ -119,22 +119,22 @@ exports.updateTaskInfo = async (taskData, taskId, userId) => {
       { new: true, runValidators: true }
     );
 
-    if (Array.isArray(task.assignedTo) && task.assignedTo.length > 0) {
-      const notifications = task.assignedTo
-        .filter((uid) => uid.toString !== userId.toString)
-        .map((uid) => ({
-          project: taskData.project,
-          message: `[${task.title}] 업무가 업데이트 되었습니다.`,
-          receiver: uid,
-          sender: userId,
-          noticeType: 'task_updated',
-          relatedTask: task._id,
-        }));
+    // if (Array.isArray(task.assignedTo) && task.assignedTo.length > 0) {
+    //   const notifications = task.assignedTo
+    //     .filter((uid) => uid.toString !== userId.toString)
+    //     .map((uid) => ({
+    //       project: taskData.project,
+    //       message: `[${task.title}] 업무가 업데이트 되었습니다.`,
+    //       receiver: uid,
+    //       sender: userId,
+    //       noticeType: 'task_updated',
+    //       relatedTask: task._id,
+    //     }));
 
-      if (notifications.length > 0) {
-        await Notification.insertMany(notifications);
-      }
-    }
+    //   if (notifications.length > 0) {
+    //     await Notification.insertMany(notifications);
+    //   }
+    // }
 
     return task;
   } catch (err) {
@@ -205,7 +205,7 @@ exports.addManagers = async (taskId, projectId, userId, managerId) => {
     }
     await taskUtil.isExistingResource(User, managerId);
 
-    const alreadyAssigned = task.assignedTo.map((uid) => uid.toString());
+    // const alreadyAssigned = task.assignedTo.map((uid) => uid.toString());
 
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
@@ -215,21 +215,21 @@ exports.addManagers = async (taskId, projectId, userId, managerId) => {
       { new: true }
     );
 
-    if (
-      !alreadyAssigned.includes(managerId.toString()) &&
-      updatedTask.assignedTo.length > 0
-    ) {
-      const notification = {
-        project: projectId,
-        message: `[${updatedTask.title}] 업무가 할당되었습니다.`,
-        receiver: managerId,
-        sender: userId,
-        noticeType: 'task_assigned',
-        relatedTask: updatedTask._id,
-      };
+    // if (
+    //   !alreadyAssigned.includes(managerId.toString()) &&
+    //   updatedTask.assignedTo.length > 0
+    // ) {
+    //   const notification = {
+    //     project: projectId,
+    //     message: `[${updatedTask.title}] 업무가 할당되었습니다.`,
+    //     receiver: managerId,
+    //     sender: userId,
+    //     noticeType: 'task_assigned',
+    //     relatedTask: updatedTask._id,
+    //   };
 
-      await Notification.create(notification);
-    }
+    //   await Notification.create(notification);
+    // }
 
     return updatedTask;
   } catch (err) {
