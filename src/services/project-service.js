@@ -15,6 +15,18 @@ exports.createProject = async (data) => {
   }
 };
 
+exports.getAllProjects = async (userId) => {
+  try {
+    const projects = await Project.find({
+      $or: [{ createdBy: userId }, { members: { $in: [userId] } }],
+    });
+
+    return projects;
+  } catch (err) {
+    throw err;
+  }
+};
+
 exports.patchProject = async (pid, userId, data) => {
   try {
     const isExistingProject = await taskUtil.isExistingResource(Project, pid);
