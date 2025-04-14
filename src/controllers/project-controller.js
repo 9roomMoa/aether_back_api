@@ -41,10 +41,33 @@ exports.createProject = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: 'Internal server error: ' + err.message,
     });
+  }
+};
+
+exports.getAllProjects = async (req, res, next) => {
+  try {
+    const userId = req.user?.sub;
+    const { teamId } = req.params;
+    const projects = await projectService.getAllProjects(userId, teamId);
+
+    if (!projects) {
+      return res.status(StatusCodes.NO_CONTENT).json({
+        success: true,
+        message: 'No projects found',
+      });
+    }
+
+    return res.status(StatusCodes.OK).json({
+      data: projects,
+      success: true,
+      message: 'Projects retrieved successfully',
+    });
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -67,14 +90,14 @@ exports.patchProject = async (req, res) => {
     }
 
     if (!Object.keys(updateData).length) {
-      res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'No data provided for update',
       });
     }
 
     if (!pid) {
-      res.status(StatusCodes.BAD_REQUEST).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
         message: 'No projectid provided',
       });
