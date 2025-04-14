@@ -13,6 +13,7 @@ const taskRouter = require('./src/routes/task-route');
 const projectRouter = require('./src/routes/project-route');
 const docsRouter = require('./src/routes/docs-route');
 const memoRouter = require('./src/routes/memo-route');
+const errorHandler = require('./src/middlewares/errorHandler');
 
 dotenv.config();
 
@@ -116,12 +117,7 @@ app.use('/api/docs', docsRouter);
 app.use('/api/memo', memoRouter);
 
 // 에러 핸들링 미들웨어
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res
-    .status(StatusCodes.INTERNAL_SERVER_ERROR)
-    .json({ message: '서버 에러 발생!' });
-});
+app.use(errorHandler);
 
 connectDB();
 

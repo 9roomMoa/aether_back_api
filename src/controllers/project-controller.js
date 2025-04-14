@@ -48,11 +48,11 @@ exports.createProject = async (req, res) => {
   }
 };
 
-exports.getAllProjects = async (req, res) => {
+exports.getAllProjects = async (req, res, next) => {
   try {
     const userId = req.user?.sub;
-
-    const projects = await projectService.getAllProjects(userId);
+    const { teamId } = req.params;
+    const projects = await projectService.getAllProjects(userId, teamId);
 
     if (!projects) {
       return res.status(StatusCodes.NO_CONTENT).json({
@@ -67,11 +67,7 @@ exports.getAllProjects = async (req, res) => {
       message: 'Projects retrieved successfully',
     });
   } catch (err) {
-    console.error(err);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: 'Internal server error: ' + err.message,
-    });
+    next(err);
   }
 };
 

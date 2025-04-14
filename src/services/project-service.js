@@ -1,4 +1,6 @@
+const { StatusCodes } = require('http-status-codes');
 const Project = require('../models/Project');
+const Team = require('../models/Team');
 const taskUtil = require('../utils/task-util');
 
 exports.createProject = async (data) => {
@@ -15,8 +17,15 @@ exports.createProject = async (data) => {
   }
 };
 
-exports.getAllProjects = async (userId) => {
+exports.getAllProjects = async (userId, teamId) => {
   try {
+    const isExistingTeam = await taskUtil.isExistingResource(Team, teamId);
+
+    if (!isExistingTeam) {
+      const error = new Error('Team not found');
+      error.statusCode = StatusCodes.NOT_FOUND;
+      throw error;
+    }
     const projects = await Project.find({
       $or: [{ createdBy: userId }, { members: { $in: [userId] } }],
     });
