@@ -253,9 +253,11 @@ exports.addManagers = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: 'Internal server error: ' + err.message,
-    });
+    return res
+      .status(err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({
+        success: false,
+        message: err.message || 'Internal server error',
+      });
   }
 };

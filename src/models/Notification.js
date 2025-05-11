@@ -21,8 +21,8 @@ const NotificationSchema = mongoose.Schema(
     noticeType: {
       type: String,
       enum: [
-        'TASK_ASSIGNED', // 업무 할당
-        'TASK_UPDATED', // 업무 업데이트
+        'TASK_ASSIGNED', // 업무 할당 V
+        'TASK_UPDATED', // 업무 업데이트 V
         'TASK_DEADLINE', // 업무 데드라인
         'COMMENT_ADDED', // 코멘트 추가
         'COMMENT_UPDATED', // 코멘트 업데이트
@@ -40,21 +40,14 @@ const NotificationSchema = mongoose.Schema(
         type: String,
         enum: ['Task', 'Comment', 'Document', 'Project'],
       },
+      taskTitle: {
+        type: String,
+      },
+      projectTitle: {
+        type: String,
+        required: true,
+      },
     },
-    // relatedTask: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'Task',
-    //   default: null,
-    // },
-    // relatedComment: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'Comment',
-    //   default: null,
-    // },
-    // relatedDocument: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   default: null,
-    // },
     isRead: {
       type: Boolean,
       default: false,
