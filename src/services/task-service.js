@@ -24,11 +24,17 @@ exports.createTask = async (taskData, userId) => {
       const notifications = task.assignedTo
         .filter((uid) => uid.toString() !== userId.toString())
         .map((uid) => ({
-          message: `${task.title} 업무가 할당되었습니다.`,
+          project: taskData.project,
+          message: `새로운 업무가 할당되었습니다.`,
           receiver: uid,
           sender: userId,
-          noticeType: 'task_assigned',
-          relatedTask: task._id,
+          noticeType: 'TASK_ASSIGNED',
+          relatedContent: {
+            id: task._id,
+            type: 'Task',
+            taskTitle: taskData.title,
+            projectTitle: isExistingProject.name,
+          },
         }));
 
       if (notifications.length > 0)
@@ -118,15 +124,23 @@ exports.updateTaskInfo = async (taskData, taskId, userId) => {
       { new: true, runValidators: true }
     );
 
+    const projectTitle = await Project.findById(task.project).select('name');
+
     if (Array.isArray(task.assignedTo) && task.assignedTo.length > 0) {
       const notifications = task.assignedTo
         .filter((uid) => uid.toString !== userId.toString)
         .map((uid) => ({
-          message: `${task.title} 업무가 업데이트 되었습니다.`,
+          project: taskData.project,
+          message: `업무가 업데이트 되었습니다.`,
           receiver: uid,
           sender: userId,
-          noticeType: 'task_updated',
-          relatedTask: task._id,
+          noticeType: 'TASK_UPDATED',
+          relatedContent: {
+            id: taskId,
+            type: 'Task',
+            taskTitle: task.title,
+            projectTitle: projectTitle.name,
+          },
         }));
 
       if (notifications.length > 0) {
@@ -193,36 +207,52 @@ exports.getManagerInfo = async (userId, taskId) => {
   }
 };
 
-exports.addManagers = async (taskId, userId, managerId) => {
+exports.addManagers = async (taskId, projectId, userId, managerId) => {
   try {
     const task = await taskUtil.isExistingResource(Task, taskId);
-    await taskUtil.isExistingResource(User, userId);
+    if (!task) {
+      const err = new Error('Task not found');
+      err.statusCode = 404;
+      throw err;
+    }
+
     const isAccessible = await taskUtil.isTaskCreator(userId, task);
     if (!isAccessible) {
-      throw new Error('You dont have privilege to add managers');
+      const err = new Error('You do not have permission to assign managers');
+      err.statusCode = 403;
+      throw err;
     }
-    await taskUtil.isExistingResource(User, managerId);
 
-    const alreadyAssigned = task.assignedTo.map((uid) => uid.toString());
+    const project = await Project.findById(projectId).select('name');
+    if (!project) {
+      const err = new Error('Project not found');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    const isAlreadyAssigned = task.assignedTo
+      .map((uid) => uid.toString())
+      .includes(managerId.toString());
 
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
-      {
-        $addToSet: { assignedTo: managerId },
-      },
+      { $addToSet: { assignedTo: managerId } },
       { new: true }
     );
 
-    if (
-      !alreadyAssigned.includes(managerId.toString()) &&
-      updatedTask.assignedTo.length > 0
-    ) {
+    if (!isAlreadyAssigned) {
       const notification = {
-        message: `${updatedTask.title} 업무가 할당되었습니다.`,
+        project: projectId,
+        message: '새로운 업무가 할당되었습니다.',
         receiver: managerId,
         sender: userId,
-        noticeType: 'task_assigned',
-        relatedTask: updatedTask._id,
+        noticeType: 'TASK_ASSIGNED',
+        relatedContent: {
+          id: taskId,
+          type: 'Task',
+          taskTitle: task.title,
+          projectTitle: project.name,
+        },
       };
 
       await Notification.create(notification);
@@ -230,7 +260,10 @@ exports.addManagers = async (taskId, userId, managerId) => {
 
     return updatedTask;
   } catch (err) {
-    console.error(err);
-    throw new Error('Error occured during adding managers');
+    console.error('Error in addManagers:', err.message);
+
+    // statusCode가 없는 일반 오류면 500으로 세팅
+    err.statusCode = err.statusCode || 500;
+    throw err;
   }
 };

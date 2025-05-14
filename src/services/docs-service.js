@@ -54,9 +54,9 @@ exports.postDocument = async (file, taskId, userId) => {
                 relatedDocument: uploadStream.id,
               }));
 
-            if (notifications.length > 0) {
-              await Notification.insertMany(notifications);
-            }
+            // if (notifications.length > 0) {
+            //   await Notification.insertMany(notifications);
+            // }
 
             resolve({
               success: true,

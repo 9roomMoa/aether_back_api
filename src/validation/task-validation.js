@@ -19,6 +19,7 @@ exports.creatingSchema = Joi.object({
 
 //상태, 공개여부, 일정, 우선선위
 exports.updatingSchema = Joi.object({
+  project: Joi.string().required(), // 프로젝트 ID
   status: Joi.string()
     .valid('To Do', 'In Progress', 'Done', 'Issue', 'Hold')
     .optional(),
@@ -29,4 +30,4 @@ exports.updatingSchema = Joi.object({
   isDaily: Joi.boolean().optional(),
   description: Joi.string().optional(),
   assignedTo: Joi.array().items(Joi.string()).optional(), // 사용자 ID
-}).min(1);
+}).min(2);

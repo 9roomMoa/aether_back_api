@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Comment = require('../models/Comment');
 const taskUtil = require('../utils/task-util');
 const Notification = require('../models/Notification');
+const Project = require('../models/Project');
 
 exports.searchComments = async (keyword, taskId, userId) => {
   try {
@@ -53,16 +54,22 @@ exports.createComment = async (commentData) => {
     await comment.save();
 
     const user = await User.findById(commentData.commenterId);
-    const tasks = await Task.findById(commentData.taskId).select('assignedTo');
+    const project = await Project.findById(isExistingTask.project);
 
-    const notifications = tasks.assignedTo
+    const notifications = isExistingTask.assignedTo
       .filter((uid) => uid.toString() !== commentData.commenterId.toString())
       .map((uid) => ({
-        message: `${user.name}님께서 코멘트를 남기셨습니다.`,
+        project: isExistingTask.project,
+        message: `${user.name}님께서 업무에 코멘트를 남기셨습니다.`,
         receiver: uid,
         sender: commentData.commenterId,
-        noticeType: 'comment_added',
-        relatedComment: comment._id,
+        noticeType: 'COMMENT_ADDED',
+        relatedContent: {
+          id: comment._id,
+          type: 'Comment',
+          taskTitle: isExistingTask.title,
+          projectTitle: project.name,
+        },
       }));
 
     if (notifications.length > 0) {
@@ -137,6 +144,30 @@ exports.updateComment = async (userId, taskId, commentId, data) => {
     }
     if (isExistingComment.commenterId.toString() !== userId) {
       throw new Error('You dont have privilege to update this comment');
+    }
+    const user = await User.findById(userId).select('name');
+    const project = await Project.findById(isExistingTask.project).select(
+      'name'
+    );
+    const members = [...isExistingTask.assignedTo, isExistingTask.createdBy];
+    const notifications = members
+      .filter((uid) => uid.toString() !== userId)
+      .map((uid) => ({
+        project: isExistingTask.project,
+        message: `${user.name}님이 업무의 코멘트를 수정하였습니다.`,
+        receiver: uid,
+        sender: userId,
+        noticeType: 'COMMENT_UPDATED',
+        relatedContent: {
+          id: commentId,
+          type: 'Comment',
+          taskTitle: isExistingTask.title,
+          projectTitle: project.name,
+        },
+      }));
+
+    if (notifications.length > 0) {
+      await Notification.insertMany(notifications);
     }
 
     const result = await Comment.findByIdAndUpdate(
