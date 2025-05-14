@@ -24,8 +24,8 @@ const NotificationSchema = mongoose.Schema(
         'TASK_ASSIGNED', // 업무 할당 V
         'TASK_UPDATED', // 업무 업데이트 V
         'TASK_DEADLINE', // 업무 데드라인
-        'COMMENT_ADDED', // 코멘트 추가
-        'COMMENT_UPDATED', // 코멘트 업데이트
+        'COMMENT_ADDED', // 코멘트 추가 V
+        'COMMENT_UPDATED', // 코멘트 업데이트 V
         'DOCUMENT_UPLOADED', // 문서 업로드
         'PROJECT_ASSIGNED', // 프로젝트 할당
         'PROJECT_UPDATED', // 프로젝트 업데이트
