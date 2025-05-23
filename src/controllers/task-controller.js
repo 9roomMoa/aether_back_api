@@ -48,6 +48,29 @@ exports.createTask = async (req, res) => {
   }
 };
 
+exports.getMyTasks = async (req, res, next) => {
+  try {
+    const { type } = req.query;
+    const userId = req.user?.sub;
+
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User ID Omission',
+      });
+    }
+
+    const tasks = await taskService.getMyTasks(type, userId);
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Retrieved tasks successfully',
+      data: tasks,
+    });
+  } catch (err) {
+    next();
+  }
+};
+
 exports.getAllTasks = async (req, res) => {
   try {
     const { pid } = req.params;
