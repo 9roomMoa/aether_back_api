@@ -17,6 +17,31 @@ exports.createProject = async (data) => {
   }
 };
 
+exports.getProjectInfo = async (userId, pid) => {
+  try {
+    const isExistingProject = await taskUtil.isExistingResource(Project, pid);
+    if (!isExistingProject) {
+      const error = new Error('Project Not Found');
+      error.statusCode = StatusCodes.NOT_FOUND;
+      throw error;
+    }
+    const isAccessible = await taskUtil.projectScopeChecker(
+      userId,
+      isExistingProject
+    );
+
+    if (!isAccessible) {
+      const error = new Error('Cannot access to this project');
+      error.statusCode = StatusCodes.NOT_ACCEPTABLE;
+      throw error;
+    }
+
+    return isExistingProject;
+  } catch (err) {
+    throw err;
+  }
+};
+
 exports.getAllProjects = async (userId, teamId) => {
   try {
     const isExistingTeam = await taskUtil.isExistingResource(Team, teamId);
