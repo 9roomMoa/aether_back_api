@@ -48,6 +48,38 @@ exports.createProject = async (req, res) => {
   }
 };
 
+exports.getProject = async (req, res, next) => {
+  try {
+    const userId = req.user?.sub;
+    const { pid } = req.params;
+
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'User Id omission',
+      });
+    }
+
+    if (!pid) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Project Id must be required',
+      });
+    }
+
+    const projectInfo = await projectService.getProjectInfo(userId, pid);
+
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Project information retrieved successfuly',
+      data: projectInfo,
+    });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};
+
 exports.getAllProjects = async (req, res, next) => {
   try {
     const userId = req.user?.sub;

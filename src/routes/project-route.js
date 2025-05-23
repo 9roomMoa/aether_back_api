@@ -8,6 +8,12 @@ const notiController = require('../controllers/noti-controller');
 router.post('/', authMiddleware.verifyToken, projectController.createProject);
 
 router.get(
+  '/:pid/info',
+  authMiddleware.verifyToken,
+  projectController.getProject
+);
+
+router.get(
   '/:teamId',
   authMiddleware.verifyToken,
   projectController.getAllProjects
