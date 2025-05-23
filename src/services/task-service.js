@@ -65,7 +65,10 @@ exports.getMyTasks = async (type, userId) => {
       else if (type == 'priority') return { priority: -1 };
       return { dueDate: 1 };
     })();
-    const tasks = await Task.find(filter).sort(sortOption).limit(5);
+    const tasks = await Task.find(filter)
+      .select('title description status priority project')
+      .sort(sortOption)
+      .limit(5);
 
     return tasks;
   } catch (err) {
