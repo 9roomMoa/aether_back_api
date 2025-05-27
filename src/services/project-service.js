@@ -92,3 +92,32 @@ exports.patchProject = async (pid, userId, data) => {
     throw new Error('Error occured during updating a project');
   }
 };
+
+exports.addMembers = async (pid, userId, memberId) => {
+  try {
+    const isExistingProject = await taskUtil.isExistingResource(Project, pid);
+    if (!isExistingProject) {
+      const err = new Error('Project Not Found');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    if (!(await taskUtil.isProjectCreator(userId, isExistingProject))) {
+      const err = new Error('you dont have privilege to update this project');
+      err.statusCode = StatusCodes.NOT_ACCEPTABLE;
+      throw err;
+    }
+
+    const result = await Project.findByIdAndUpdate(
+      pid,
+      { $addToSet: { members: memberId } },
+      { new: true }
+    );
+
+    return result;
+  } catch (err) {
+    console.error(err);
+    err.statusCode = err.statusCode || 500;
+    throw err;
+  }
+};

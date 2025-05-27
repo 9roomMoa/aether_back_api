@@ -150,3 +150,28 @@ exports.patchProject = async (req, res) => {
     });
   }
 };
+
+exports.addMembers = async (req, res, next) => {
+  try {
+    const { pid } = req.params;
+    const { memberId } = req.body;
+    if (!pid) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Project ID omission',
+      });
+    }
+
+    const userId = req.user?.sub;
+
+    const result = await projectService.addMembers(pid, userId, memberId);
+
+    return res.status(StatusCodes.OK).json({
+      data: result,
+      success: true,
+      message: false,
+    });
+  } catch (err) {
+    next();
+  }
+};
