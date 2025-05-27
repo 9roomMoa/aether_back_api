@@ -25,10 +25,22 @@ router.patch(
   projectController.patchProject
 );
 
+router.patch(
+  '/:pid/members',
+  authMiddleware.verifyToken,
+  projectController.addMembers
+);
+
 router.get(
   '/:pid/members',
   authMiddleware.verifyToken,
   userController.getUserInfoByKeyword
+);
+
+router.get(
+  '/members',
+  authMiddleware.verifyToken,
+  userController.getAllUserInfoByKeyword
 );
 
 router.get(

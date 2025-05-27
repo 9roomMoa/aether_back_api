@@ -58,3 +58,41 @@ exports.getUserInfoByKeyword = async (req, res) => {
     });
   }
 };
+
+exports.getAllUserInfoByKeyword = async (req, res, next) => {
+  try {
+    const userId = req.user?.sub;
+    const { keyword } = req.query;
+    if (!userId) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'userID omission',
+      });
+    }
+
+    if (!keyword) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: '이름을 입력해주세요.',
+      });
+    }
+
+    const userList = await userService.getAllUserInfoByKeyword(userId, keyword);
+
+    if (!userList || userList.length === 0) {
+      return res.status(StatusCodes.NO_CONTENT).json({
+        success: true,
+        message: 'No member found',
+      });
+    }
+
+    return res.status(StatusCodes.OK).json({
+      data: userList,
+      success: true,
+      message: 'User info retrieved successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};

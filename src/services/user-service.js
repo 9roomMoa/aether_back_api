@@ -31,3 +31,23 @@ exports.getUserInfoByKeyword = async (userId, projectId, keyword) => {
     throw err;
   }
 };
+
+exports.getAllUserInfoByKeyword = async (userId, keyword) => {
+  try {
+    const filter = {
+      _id: { $ne: userId },
+    };
+
+    if (keyword) {
+      filter.name = { $regex: keyword, $options: 'i' }; // 대소문자 구분 없이 검색
+    }
+
+    const userList = await User.find(filter).select('name rank');
+
+    return userList;
+  } catch (err) {
+    console.error(err);
+    err.statusCode = err.statusCode || 500;
+    throw err;
+  }
+};
