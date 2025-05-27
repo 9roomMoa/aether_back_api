@@ -38,6 +38,12 @@ router.get(
 );
 
 router.get(
+  '/members',
+  authMiddleware.verifyToken,
+  userController.getAllUserInfoByKeyword
+);
+
+router.get(
   '/:pid/notifications',
   authMiddleware.verifyToken,
   notiController.getNotifications
