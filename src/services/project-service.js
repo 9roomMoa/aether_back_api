@@ -1,4 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
+const mongoose = require('mongoose');
 const Project = require('../models/Project');
 const Team = require('../models/Team');
 const taskUtil = require('../utils/task-util');
@@ -110,7 +111,7 @@ exports.addMembers = async (pid, userId, memberId) => {
 
     const result = await Project.findByIdAndUpdate(
       pid,
-      { $addToSet: { members: memberId } },
+      { $addToSet: { members: new mongoose.Types.ObjectId(memberId) } },
       { new: true }
     );
 
