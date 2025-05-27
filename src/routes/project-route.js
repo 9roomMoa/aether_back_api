@@ -25,7 +25,7 @@ router.patch(
   projectController.patchProject
 );
 
-router.post(
+router.patch(
   '/:pid/members',
   authMiddleware.verifyToken,
   projectController.addMembers
