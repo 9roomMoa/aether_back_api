@@ -19,6 +19,12 @@ router.get(
   projectController.getAllProjects
 );
 
+router.get(
+  '/:pid/members',
+  authMiddleware.verifyToken,
+  projectController.getProjectMemberInfo
+);
+
 router.patch(
   '/:pid',
   authMiddleware.verifyToken,
@@ -32,7 +38,7 @@ router.patch(
 );
 
 router.get(
-  '/:pid/members',
+  '/:pid/members/search',
   authMiddleware.verifyToken,
   userController.getUserInfoByKeyword
 );
