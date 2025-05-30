@@ -62,6 +62,31 @@ exports.getAllProjects = async (userId, teamId) => {
   }
 };
 
+exports.getProjectMemberInfo = async (pid) => {
+  try {
+    const isExistingProject = await taskUtil.isExistingResource(Project, pid);
+    if (!isExistingProject) {
+      const error = new Error('No Project Found');
+      error.statusCode = StatusCodes.NOT_FOUND;
+      throw error;
+    }
+
+    const project = await Project.findById(pid)
+      .populate('createdBy', 'name rank')
+      .populate('members', 'name rank');
+
+    const creator = project.createdBy;
+    const members = project.members;
+
+    return {
+      creator,
+      members,
+    };
+  } catch (err) {
+    throw err;
+  }
+};
+
 exports.patchProject = async (pid, userId, data) => {
   try {
     const isExistingProject = await taskUtil.isExistingResource(Project, pid);

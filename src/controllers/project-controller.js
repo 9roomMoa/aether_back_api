@@ -103,6 +103,22 @@ exports.getAllProjects = async (req, res, next) => {
   }
 };
 
+exports.getProjectMemberInfo = async (req, res, next) => {
+  try {
+    const { pid } = req.params;
+
+    const userList = await projectService.getProjectMemberInfo(pid);
+
+    return res.status(StatusCodes.OK).json({
+      data: userList,
+      success: true,
+      message: 'User Info retrieved successfully',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.patchProject = async (req, res) => {
   try {
     const { pid } = req.params;
