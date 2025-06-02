@@ -106,7 +106,8 @@ exports.getAllProjects = async (req, res, next) => {
   try {
     const userId = req.user?.sub;
     const { teamId } = req.params;
-    const projects = await projectService.getAllProjects(userId, teamId);
+    const { type } = req.query;
+    const projects = await projectService.getAllProjects(type, userId, teamId);
 
     if (!projects) {
       return res.status(StatusCodes.NO_CONTENT).json({
