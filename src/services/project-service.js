@@ -18,6 +18,41 @@ exports.createProject = async (data) => {
   }
 };
 
+exports.getMyProjects = async (type, userId) => {
+  try {
+    const filter = {
+      $and: [
+        {
+          $or: [{ members: userId }, { createdBy: userId }],
+        },
+        {
+          dueDate: { $exists: true, $ne: null },
+        },
+      ],
+    };
+
+    if (type === 'priority') {
+      filter.$and.push({ priority: { $exists: true, $ne: null } });
+    }
+
+    const sortOption = (() => {
+      if (type === 'dueDate') return { dueDate: 1 };
+      else if (type == 'priority') return { priority: -1 };
+      return { dueDate: 1 };
+    })();
+
+    const projects = await Project.find(filter)
+      .select('name description status')
+      .sort(sortOption)
+      .limit(4);
+
+    return projects;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 exports.getProjectInfo = async (userId, pid) => {
   try {
     const isExistingProject = await taskUtil.isExistingResource(Project, pid);
