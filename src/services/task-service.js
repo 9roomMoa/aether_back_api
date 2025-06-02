@@ -77,19 +77,35 @@ exports.getMyTasks = async (type, userId) => {
   }
 };
 
-exports.getAllTasks = async (project, userId) => {
+exports.getAllTasks = async (type, project, userId) => {
   try {
     const existingProject = await Project.findById(project);
     if (!existingProject) {
       throw new Error('Invalid Project ID');
     }
-    if (!(await taskUtil.projectScopeChecker(userId, existingProject))) {
-      throw new Error('You dont have privilege to access this project');
+
+    const hasAccess = await taskUtil.projectScopeChecker(
+      userId,
+      existingProject
+    );
+    if (!hasAccess) {
+      throw new Error('You don’t have privilege to access this project');
     }
-    const task = await Task.find({
+
+    const filter = {
       project: project,
       $or: [{ createdBy: userId }, { assignedTo: { $in: [userId] } }],
-    }).select('title description status priority');
+    };
+
+    const sortOption = (() => {
+      if (type === 'priority') return { priority: -1 };
+      else if (type === 'dueDate') return { dueDate: 1 };
+      return { dueDate: 1 };
+    })();
+
+    const task = await Task.find(filter)
+      .select('title description status priority dueDate')
+      .sort(sortOption);
 
     return task;
   } catch (err) {

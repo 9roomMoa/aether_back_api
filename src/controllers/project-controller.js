@@ -48,6 +48,28 @@ exports.createProject = async (req, res) => {
   }
 };
 
+exports.getMyProjects = async (req, res, next) => {
+  try {
+    const { type } = req.query;
+    const userId = req.user?.sub;
+
+    const projects = await projectService.getMyProjects(type, userId);
+    if (!projects) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: true,
+        message: 'No Project Found',
+      });
+    }
+    return res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Project retrieved successfully',
+      data: projects,
+    });
+  } catch (err) {
+    next();
+  }
+};
+
 exports.getProject = async (req, res, next) => {
   try {
     const userId = req.user?.sub;
@@ -84,7 +106,8 @@ exports.getAllProjects = async (req, res, next) => {
   try {
     const userId = req.user?.sub;
     const { teamId } = req.params;
-    const projects = await projectService.getAllProjects(userId, teamId);
+    const { type } = req.query;
+    const projects = await projectService.getAllProjects(type, userId, teamId);
 
     if (!projects) {
       return res.status(StatusCodes.NO_CONTENT).json({

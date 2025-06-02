@@ -8,6 +8,12 @@ const notiController = require('../controllers/noti-controller');
 router.post('/', authMiddleware.verifyToken, projectController.createProject);
 
 router.get(
+  '/dashboard',
+  authMiddleware.verifyToken,
+  projectController.getMyProjects
+);
+
+router.get(
   '/:pid/info',
   authMiddleware.verifyToken,
   projectController.getProject

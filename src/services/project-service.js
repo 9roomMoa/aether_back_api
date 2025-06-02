@@ -18,6 +18,41 @@ exports.createProject = async (data) => {
   }
 };
 
+exports.getMyProjects = async (type, userId) => {
+  try {
+    const filter = {
+      $and: [
+        {
+          $or: [{ members: userId }, { createdBy: userId }],
+        },
+        {
+          dueDate: { $exists: true, $ne: null },
+        },
+      ],
+    };
+
+    if (type === 'priority') {
+      filter.$and.push({ priority: { $exists: true, $ne: null } });
+    }
+
+    const sortOption = (() => {
+      if (type === 'dueDate') return { dueDate: 1 };
+      else if (type == 'priority') return { priority: -1 };
+      return { dueDate: 1 };
+    })();
+
+    const projects = await Project.find(filter)
+      .select('name description status')
+      .sort(sortOption)
+      .limit(4);
+
+    return projects;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 exports.getProjectInfo = async (userId, pid) => {
   try {
     const isExistingProject = await taskUtil.isExistingResource(Project, pid);
@@ -43,18 +78,29 @@ exports.getProjectInfo = async (userId, pid) => {
   }
 };
 
-exports.getAllProjects = async (userId, teamId) => {
+exports.getAllProjects = async (type, userId, teamId) => {
   try {
-    const isExistingTeam = await taskUtil.isExistingResource(Team, teamId);
+    // 팀 존재 여부 확인 로직 (필요 시 주석 해제)
+    // const isExistingTeam = await taskUtil.isExistingResource(Team, teamId);
+    // if (!isExistingTeam) {
+    //   const error = new Error('Team not found');
+    //   error.statusCode = StatusCodes.NOT_FOUND;
+    //   throw error;
+    // }
 
-    if (!isExistingTeam) {
-      const error = new Error('Team not found');
-      error.statusCode = StatusCodes.NOT_FOUND;
-      throw error;
-    }
-    const projects = await Project.find({
+    const filter = {
       $or: [{ createdBy: userId }, { members: { $in: [userId] } }],
-    });
+    };
+
+    const sortOption = (() => {
+      if (type === 'priority') return { priority: -1 };
+      else if (type === 'dueDate') return { dueDate: 1 };
+      return { dueDate: 1 };
+    })();
+
+    const projects = await Project.find(filter)
+      .select('name description status dueDate priority') // 필요한 필드만 선택
+      .sort(sortOption);
 
     return projects;
   } catch (err) {

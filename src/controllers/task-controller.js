@@ -74,6 +74,7 @@ exports.getMyTasks = async (req, res, next) => {
 exports.getAllTasks = async (req, res) => {
   try {
     const { pid } = req.params;
+    const { type } = req.query;
     const userId = req.user.sub;
     if (!pid) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -87,7 +88,7 @@ exports.getAllTasks = async (req, res) => {
         message: 'User ID Omission',
       });
     }
-    const tasks = await taskService.getAllTasks(pid, userId);
+    const tasks = await taskService.getAllTasks(type, pid, userId);
 
     if (!tasks || tasks.length === 0) {
       return res.status(StatusCodes.NO_CONTENT).json({
