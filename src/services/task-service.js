@@ -50,23 +50,24 @@ exports.createTask = async (taskData, userId) => {
 
 exports.getMyTasks = async (type, userId) => {
   try {
-    const filter = {
-      $and: [
-        {
-          $or: [{ assignedTo: userId }, { createdBy: userId }],
-        },
-        {
-          dueDate: { $exists: true, $ne: null },
-        },
-      ],
+    const baseFilter = {
+      $or: [{ assignedTo: userId }, { createdBy: userId }],
     };
+
     const sortOption = (() => {
       if (type === 'dueDate') return { dueDate: 1 };
       else if (type == 'priority') return { priority: -1 };
       return { dueDate: 1 };
     })();
+
+    const filter =
+      type === 'dueDate'
+        ? {
+            $and: [baseFilter, { dueDate: { $exists: true, $ne: null } }],
+          }
+        : baseFilter;
     const tasks = await Task.find(filter)
-      .select('title description status priority project')
+      .select('title description status priority project dueDate')
       .sort(sortOption)
       .limit(5);
 
