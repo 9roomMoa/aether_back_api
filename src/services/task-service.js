@@ -172,60 +172,26 @@ exports.updateTaskInfo = async (taskData, taskId, userId) => {
 
     const projectTitle = await Project.findById(task.project).select('name');
 
-    // if (Array.isArray(task.assignedTo) && task.assignedTo.length > 0) {
-    //   const notifications = task.assignedTo
-    //     .filter((uid) => uid.toString !== userId.toString)
-    //     .map((uid) => ({
-    //       project: taskData.project,
-    //       message: `업무가 업데이트 되었습니다.`,
-    //       receiver: uid,
-    //       sender: userId,
-    //       noticeType: 'TASK_UPDATED',
-    //       relatedContent: {
-    //         id: taskId,
-    //         type: 'Task',
-    //         taskTitle: task.title,
-    //         projectTitle: projectTitle.name,
-    //       },
-    //     }));
+    if (Array.isArray(task.assignedTo) && task.assignedTo.length > 0) {
+      const notifications = task.assignedTo
+        .filter((uid) => uid.toString !== userId.toString)
+        .map((uid) => ({
+          project: taskData.project,
+          message: `업무가 업데이트 되었습니다.`,
+          receiver: uid,
+          sender: userId,
+          noticeType: 'TASK_UPDATED',
+          relatedContent: {
+            id: taskId,
+            type: 'Task',
+            taskTitle: task.title,
+            projectTitle: projectTitle.name,
+          },
+        }));
 
-    //   if (notifications.length > 0) {
-    //     await Notification.insertMany(notifications);
-    //   }
-    // }
-    const receivers = new Set();
-
-    // 1. 할당자 중에서 작성자를 제외하고 알림 대상에 추가
-    if (Array.isArray(task.assignedTo)) {
-      task.assignedTo.forEach((uid) => {
-        if (uid.toString() !== userId.toString()) {
-          receivers.add(uid.toString());
-        }
-      });
-    }
-
-    // 2. 생성자가 작성자가 아니라면 추가
-    if (task.createdBy && task.createdBy.toString() !== userId.toString()) {
-      receivers.add(task.createdBy.toString());
-    }
-
-    // 3. 알림 생성
-    const notifications = Array.from(receivers).map((receiverId) => ({
-      project: taskData.project,
-      message: `업무에 댓글이 등록되었습니다.`,
-      receiver: receiverId,
-      sender: userId,
-      noticeType: 'TASK_COMMENTED',
-      relatedContent: {
-        id: taskId,
-        type: 'Task',
-        taskTitle: task.title,
-        projectTitle: projectTitle.name,
-      },
-    }));
-
-    if (notifications.length > 0) {
-      await Notification.insertMany(notifications);
+      if (notifications.length > 0) {
+        await Notification.insertMany(notifications);
+      }
     }
 
     return task;
