@@ -28,6 +28,7 @@ exports.updatingSchema = Joi.object({
   dueDate: Joi.date().optional(),
   projectScope: Joi.string().valid('Public', 'Restricted').optional(),
   isDaily: Joi.boolean().optional(),
+  title: Joi.string().optional(),
   description: Joi.string().optional(),
   assignedTo: Joi.array().items(Joi.string()).optional(), // 사용자 ID
 }).min(2);
